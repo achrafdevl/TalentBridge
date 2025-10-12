@@ -1,0 +1,9 @@
+# Force LF for all text files
+* text=auto
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.css text
+*.json text
+*.md text
