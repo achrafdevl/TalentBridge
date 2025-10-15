@@ -16,44 +16,45 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaPlus,
-  FaEye
+  FaEye,
 } from "react-icons/fa";
 import { cn } from "@/app/lib/utils";
+import Image from "next/image";
 
 const menuItems = [
-  { 
-    title: "Dashboard", 
-    icon: FaTachometerAlt, 
+  {
+    title: "Dashboard",
+    icon: FaTachometerAlt,
     path: "/dashboard",
-    badge: null
+    badge: null,
   },
-  { 
-    title: "Profil Pro", 
-    icon: FaUser, 
+  {
+    title: "Profil Pro",
+    icon: FaUser,
     path: "/job-profile",
-    badge: null
+    badge: null,
   },
-  { 
-    title: "CV & Candidatures", 
-    icon: FaFileAlt, 
+  {
+    title: "CV & Candidatures",
+    icon: FaFileAlt,
     path: "/cv-generate",
     badge: "3",
     subItems: [
       { title: "Générer un CV", path: "/cv-generate", icon: FaPlus },
-      { title: "Mes CV", path: "/cv-generate?tab=my-resumes", icon: FaEye }
-    ]
+      { title: "Mes CV", path: "/cv-generate?tab=my-resumes", icon: FaEye },
+    ],
   },
-  { 
-    title: "Offres d'emploi", 
-    icon: FaBriefcase, 
+  {
+    title: "Offres d'emploi",
+    icon: FaBriefcase,
     path: "/job-offers",
-    badge: "12"
+    badge: "12",
   },
-  { 
-    title: "Mon Profil", 
-    icon: FaCog, 
+  {
+    title: "Mon Profil",
+    icon: FaCog,
     path: "/profile",
-    badge: null
+    badge: null,
   },
 ];
 
@@ -68,9 +69,9 @@ export default function Sidebar() {
   const current = normalize(pathname);
 
   const toggleExpanded = (path: string) => {
-    setExpandedItems(prev => 
-      prev.includes(path) 
-        ? prev.filter(item => item !== path)
+    setExpandedItems((prev) =>
+      prev.includes(path)
+        ? prev.filter((item) => item !== path)
         : [...prev, path]
     );
   };
@@ -88,11 +89,14 @@ export default function Sidebar() {
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <FaBriefcase className="w-5 h-5 text-white" />
+              {/* <FaBriefcase className="w-5 h-5 text-white" /> */}
+              <Image src="/Logo.png" alt="TalentBridge" width={200} height={200} />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-wide">TalentBridge</h1>
-              <p className="text-xs opacity-75">Votre carrière, notre passion</p>
+              <p className="text-xs opacity-75">
+                Votre carrière, notre passion
+              </p>
             </div>
           </div>
         )}
@@ -109,7 +113,8 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-2 mt-6 px-3 flex-grow overflow-y-auto">
         {menuItems.map((item) => {
           const itemPath = normalize(item.path);
-          const isActive = current === itemPath || current.startsWith(itemPath + "/");
+          const isActive =
+            current === itemPath || current.startsWith(itemPath + "/");
           const isExpanded = expandedItems.includes(item.path);
           const hasSubItems = item.subItems && item.subItems.length > 0;
 
@@ -130,28 +135,32 @@ export default function Sidebar() {
                   {isActive && (
                     <div className="absolute left-0 top-0 w-1 h-full bg-[#1C96AD] rounded-r-full"></div>
                   )}
-                  
-                  <item.icon className={cn(
-                    "h-5 w-5 flex-shrink-0 transition-all duration-200",
-                    isActive ? "text-[#1C96AD]" : "text-white/90"
-                  )} />
-                  
+
+                  <item.icon
+                    className={cn(
+                      "h-5 w-5 flex-shrink-0 transition-all duration-200",
+                      isActive ? "text-[#1C96AD]" : "text-white/90"
+                    )}
+                  />
+
                   {!collapsed && (
                     <>
                       <span className="flex-1">{item.title}</span>
-                      
+
                       {/* Badge de notification */}
                       {item.badge && (
-                        <span className={cn(
-                          "px-2 py-1 rounded-full text-xs font-bold",
-                          isActive 
-                            ? "bg-[#1C96AD] text-white" 
-                            : "bg-white/20 text-white"
-                        )}>
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded-full text-xs font-bold",
+                            isActive
+                              ? "bg-[#1C96AD] text-white"
+                              : "bg-white/20 text-white"
+                          )}
+                        >
                           {item.badge}
                         </span>
                       )}
-                      
+
                       {/* Flèche pour sous-menus */}
                       {hasSubItems && (
                         <button
@@ -179,7 +188,7 @@ export default function Sidebar() {
                   {item.subItems!.map((subItem) => {
                     const subItemPath = normalize(subItem.path);
                     const isSubActive = current === subItemPath;
-                    
+
                     return (
                       <Link
                         key={subItem.path}
@@ -216,7 +225,7 @@ export default function Sidebar() {
             </div>
           </div>
         )}
-        
+
         <button
           onClick={() => dispatch(logout())}
           className={cn(

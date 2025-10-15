@@ -301,7 +301,7 @@ const HeroSection: React.FC = () => {
 
                 {/* AI Badge */}
                 <motion.div
-                  className="absolute top-1 right-2 bg-gradient-to-r from-[#43C6AC] to-[#1C96AD] text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl"
+                  className="absolute top- right-2 bg-gradient-to-r from-[#43C6AC] to-[#1C96AD] text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >

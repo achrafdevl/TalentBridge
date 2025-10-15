@@ -34,7 +34,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
+    <div className="min-h-screen flex bg-gray-50">
       <Sidebar />
       <main className="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto">
         {children}
