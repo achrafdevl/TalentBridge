@@ -1,75 +1,105 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+// src/redux/slices/authSlice.ts
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import Cookies from "js-cookie";
 
-export interface User {
-  id?: string;
-  full_name?: string;
-  email?: string;
+// ---------------- Types ----------------
+interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+  skills?: string;
 }
 
-export interface AuthResponse {
-  access_token?: string;
-  token?: string;
-  user?: User;
-  data?: {
-    access_token?: string;
-    user?: User;
-  };
-}
-
-export interface AuthState {
+interface AuthState {
   user: User | null;
   token: string | null;
   loading: boolean;
   error: string | null;
 }
 
-const safeGetLocal = (k: string) =>
-  typeof window !== "undefined" ? localStorage.getItem(k) : null;
+// Type for Axios error
+interface AxiosErrorResponse {
+  response?: {
+    data?: {
+      detail?: string;
+    };
+  };
+}
 
+// ---------------- Initial State ----------------
 const initialState: AuthState = {
-  user: safeGetLocal("tb_user")
-    ? JSON.parse(safeGetLocal("tb_user") as string)
-    : null,
-  token: safeGetLocal("tb_token"),
+  user: null,
+  token: Cookies.get("tb_token") || null,
   loading: false,
   error: null,
 };
 
-const API_URL = "http://localhost:8000/auth";
+// ---------------- Async Thunks ----------------
 
-// ----- Thunks -----
-
+// Login
 export const loginUser = createAsyncThunk<
-  AuthResponse,
+  { access_token: string; user: User },
   { email: string; password: string },
   { rejectValue: string }
->("auth/loginUser", async (data, { rejectWithValue }) => {
-  try {
-    const res = await axios.post(`${API_URL}/login`, data);
-    return res.data as AuthResponse;
-  } catch (error) {
-    const err = error as AxiosError<{ detail?: string }>;
-    return rejectWithValue(err.response?.data?.detail || "Login failed");
+>(
+  "auth/loginUser",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("http://localhost:8000/auth/login", credentials);
+      Cookies.set("tb_token", response.data.access_token, { expires: 7 });
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as AxiosErrorResponse;
+      return rejectWithValue(error.response?.data?.detail || "Login failed");
+    }
   }
-});
+);
 
+// Signup
 export const signupUser = createAsyncThunk<
-  AuthResponse,
+  { access_token: string; user: User },
   { full_name: string; email: string; password: string },
   { rejectValue: string }
->("auth/signupUser", async (data, { rejectWithValue }) => {
-  try {
-    const res = await axios.post(`${API_URL}/register`, data);
-    return res.data as AuthResponse;
-  } catch (error) {
-    const err = error as AxiosError<{ detail?: string }>;
-    return rejectWithValue(err.response?.data?.detail || "Signup failed");
+>(
+  "auth/signupUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("http://localhost:8000/auth/register", data);
+      Cookies.set("tb_token", response.data.access_token, { expires: 7 });
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as AxiosErrorResponse;
+      return rejectWithValue(error.response?.data?.detail || "Signup failed");
+    }
   }
-});
+);
 
-// ----- Slice -----
+// Update Profile
+export const updateProfile = createAsyncThunk<User, { full_name?: string; phone?: string; location?: string; bio?: string; skills?: string }, { state: { auth: AuthState }; rejectValue: string }>(
+  "auth/updateProfile",
+  async (profileData, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const response = await axios.put(
+        "http://localhost:8000/users/profile",
+        profileData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as AxiosErrorResponse;
+      return rejectWithValue(error.response?.data?.detail || "Failed to update profile");
+    }
+  }
+);
 
+
+// ---------------- Slice ----------------
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -77,89 +107,55 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("tb_token");
-        localStorage.removeItem("tb_user");
-        document.cookie =
-          "tb_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      }
-    },
-    setTokenAndUser: (
-      state,
-      action: PayloadAction<{ token?: string; user?: User }>
-    ) => {
-      state.token = action.payload.token ?? null;
-      state.user = action.payload.user ?? null;
-      if (typeof window !== "undefined") {
-        if (state.token) {
-          localStorage.setItem("tb_token", state.token);
-          document.cookie = `tb_token=${state.token}; path=/; max-age=${
-            60 * 60 * 24 * 7
-          }`;
-        }
-        if (state.user)
-          localStorage.setItem("tb_user", JSON.stringify(state.user));
-      }
+      state.error = null;
+      Cookies.remove("tb_token");
     },
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        loginUser.fulfilled,
-        (state, action: PayloadAction<AuthResponse>) => {
-          state.loading = false;
-          const token =
-            action.payload?.access_token ??
-            action.payload?.token ??
-            action.payload?.data?.access_token ??
-            null;
-          const user =
-            action.payload?.user ?? action.payload?.data?.user ?? null;
-          state.token = token;
-          state.user = user;
-          if (typeof window !== "undefined") {
-            if (token) localStorage.setItem("tb_token", token);
-            if (user) localStorage.setItem("tb_user", JSON.stringify(user));
-          }
-        }
-      )
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.access_token;
+        state.user = action.payload.user;
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? "Login failed";
+        state.error = action.payload || "Login failed";
       })
+      // Signup
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        signupUser.fulfilled,
-        (state, action: PayloadAction<AuthResponse>) => {
-          state.loading = false;
-          const token =
-            action.payload?.access_token ??
-            action.payload?.token ??
-            action.payload?.data?.access_token ??
-            null;
-          const user =
-            action.payload?.user ?? action.payload?.data?.user ?? null;
-          state.token = token;
-          state.user = user;
-          if (typeof window !== "undefined") {
-            if (token) localStorage.setItem("tb_token", token);
-            if (user) localStorage.setItem("tb_user", JSON.stringify(user));
-          }
-        }
-      )
+      .addCase(signupUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.access_token;
+        state.user = action.payload.user;
+      })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? "Signup failed";
+        state.error = action.payload || "Signup failed";
+      })
+      // Update Profile
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.user) state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update profile";
       });
   },
 });
 
-export const { logout, setTokenAndUser } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

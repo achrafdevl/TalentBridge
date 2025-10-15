@@ -1,11 +1,12 @@
+// src/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("tb_token");
+  const token = request.cookies.get("tb_token")?.value; // read from cookie
   const { pathname } = request.nextUrl;
 
-  // Only protect dashboard routes, let auth pages handle their own redirects
+  // Protect dashboard routes
   if (pathname.startsWith("/dashboard") && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

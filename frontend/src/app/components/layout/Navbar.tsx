@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -13,10 +14,13 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <img
-                src="/TalentBridge.png"
+              
+              <Image
+                src="/TalentBridge2.png"
                 alt="TalentBridge"
-                className="h-8 w-auto"
+                className=""
+                width={180}
+                height={180}
               />
             </Link>
           </div>
@@ -62,7 +66,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="ml-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                className="ml-3 bg-[#1C96AD] text-white px-4 py-2 rounded-md text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
               >
                 S&apos;inscrire
               </Link>

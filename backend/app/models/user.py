@@ -19,3 +19,12 @@ class UserLogin(BaseModel):
 
 class UserResponse(MongoBaseModel, UserBase):
     pass
+
+# ✅ New model for updating profile (all fields optional)
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    bio: Optional[str] = None
+    location: Optional[str] = None
+    profile_image: Optional[str] = None
+    social_links: Optional[Dict[str, str]] = None
