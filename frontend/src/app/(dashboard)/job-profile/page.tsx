@@ -1,294 +1,318 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  FaUser, 
-  FaBriefcase, 
-  FaGraduationCap, 
-  FaMapMarkerAlt,
-  FaDollarSign,
-  FaClock,
-  FaEdit,
-  FaSave,
-  FaTimes,
-  FaPlus
-} from "react-icons/fa";
+import { FaBuilding, FaUserTie, FaClock, FaTags, FaPlus, FaChevronUp, FaChevronDown, FaExpand } from "react-icons/fa";
 import { Card } from "@/app/components/ui/Card";
 
-interface JobPreference {
+interface Experience {
   id: string;
-  title: string;
-  location: string;
-  salaryRange: string;
-  jobType: string;
-  industry: string;
+  company: string;
+  position: string;
+  responsibilities: string;
 }
 
-export default function JobProfile() {
-  const [isEditing, setIsEditing] = useState(false);
-  const [preferences, setPreferences] = useState<JobPreference[]>([
+interface Education {
+  id: string;
+  school: string;
+  certificate: string;
+}
+
+interface Skill {
+  id: string;
+  name: string;
+  level: number;
+}
+
+interface Language {
+  id: string;
+  name: string;
+  level: string;
+}
+
+export default function ProfessionalExperiences() {
+  const [experiences, setExperiences] = useState<Experience[]>([
     {
       id: "1",
-      title: "Développeur Full Stack",
-      location: "Paris, France",
-      salaryRange: "45k - 65k €",
-      jobType: "CDI",
-      industry: "Tech"
-    },
-    {
-      id: "2", 
-      title: "Ingénieur Frontend",
-      location: "Lyon, France",
-      salaryRange: "40k - 55k €",
-      jobType: "CDI",
-      industry: "Startup"
+      company: "Eco Habitat Lux Inc.",
+      position: "Creative Art Director",
+      responsibilities: "Successfully increased annual revenue to 1M SAR yearly through strategic initiatives..."
     }
   ]);
 
-  const [formData, setFormData] = useState({
-    desiredPosition: "Développeur Full Stack Senior",
-    preferredLocation: "Paris, France",
-    salaryExpectation: "55k - 75k €",
-    jobType: "CDI",
-    workMode: "Hybride",
-    availability: "Immédiate",
-    industries: "Tech, Fintech, E-commerce",
-    skills: "React, Node.js, TypeScript, Python, AWS"
+  const [education, setEducation] = useState<Education[]>([
+    { id: "1", school: "University Hassan 2", certificate: "Master of Multimedia Design & Development" },
+    { id: "2", school: "Creative Art Director", certificate: "Master of Multimedia Design & Development" }
+  ]);
+
+  const [competences] = useState([
+    { name: "Branding", level: 2 },
+    { name: "User Experience", level: 1 },
+    { name: "Graphic Design", level: 0 },
+    { name: "Motion Design", level: 1 },
+    { name: "Web Development", level: 2 },
+    { name: "3D Design", level: 2 },
+    { name: "Adobe Creative Suite", level: 1 },
+    { name: "Illustration", level: 1 },
+    { name: "UI Design", level: 0 }
+  ]);
+
+  const [skills] = useState([
+    { name: "3D Design", level: 2 },
+    { name: "Web Development", level: 1 },
+    { name: "UI Design", level: 0 }
+  ]);
+
+  const [softSkills] = useState([
+    { name: "Figma", level: 2 },
+    { name: "Photoshop", level: 1 },
+    { name: "Illustrator", level: 0 },
+    { name: "Framer", level: 1 },
+    { name: "Spline", level: 2 },
+    { name: "Blender", level: 2 },
+    { name: "After Effects", level: 2 },
+    { name: "Adobe Premiere Pro", level: 2 },
+    { name: "Canvas", level: 1 }
+  ]);
+
+  const [languages] = useState([
+    { name: "Arabic", level: "Native" },
+    { name: "English", level: "Fluent" },
+    { name: "Spanish", level: "Basic" }
+  ]);
+
+  const [newExperience, setNewExperience] = useState<Experience>({
+    id: "",
+    company: "",
+    position: "",
+    responsibilities: "",
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Ici vous pourriez envoyer les données vers votre API
+  const [expandedSections, setExpandedSections] = useState({
+    professionalExperiences: true,
+    education: false,
+    competences: false,
+    skills: false,
+    softSkills: false,
+    languages: false
+  });
+
+  const [isAddingExperience, setIsAddingExperience] = useState(false);
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    // Reset form data to original values
+  const handleAddExperience = () => {
+    if (!newExperience.company || !newExperience.position) return;
+    setExperiences([...experiences, { ...newExperience, id: Date.now().toString() }]);
+    setNewExperience({ id: "", company: "", position: "", responsibilities: "" });
+    setIsAddingExperience(false);
   };
 
-  return (
-    <div className="space-y-8 p-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Profil Professionnel</h1>
-          <p className="text-gray-500 mt-2">
-            Gérez vos préférences de carrière et objectifs professionnels
-          </p>
-        </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="flex items-center gap-2 px-6 py-3 bg-[#1C96AD] text-white rounded-xl hover:bg-[#178496] transition-all shadow-lg"
-        >
-          {isEditing ? <FaTimes /> : <FaEdit />}
-          {isEditing ? "Annuler" : "Modifier"}
+  const getLevelColor = (level: number) => {
+    switch (level) {
+      case 0: return "bg-red-100 text-red-600 border-red-200";
+      case 1: return "bg-orange-100 text-orange-600 border-orange-200";
+      case 2: return "bg-green-100 text-green-600 border-green-200";
+      default: return "bg-gray-100 text-gray-600 border-gray-200";
+    }
+  };
+
+  // Section header reusable component
+  const SectionHeader = ({ title, sectionKey, icon }: { title: string; sectionKey: keyof typeof expandedSections; icon: JSX.Element }) => (
+    <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center space-x-3">
+        <div className="w-6 h-6 bg-teal-500 rounded flex items-center justify-center">{icon}</div>
+        <h3 className="font-semibold text-gray-800">{title}</h3>
+      </div>
+      <div className="flex items-center space-x-2">
+        <button onClick={() => toggleSection(sectionKey)} className="p-1 hover:bg-gray-100 rounded">
+          {expandedSections[sectionKey] ? <FaChevronUp className="text-sm" /> : <FaChevronDown className="text-sm" />}
         </button>
+        <button className="p-1 hover:bg-gray-100 rounded"><FaExpand className="text-gray-400 text-xs" /></button>
       </div>
+    </div>
+  );
 
-      {/* Informations principales */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-8 shadow-lg border-0 bg-gradient-to-br from-blue-50 to-indigo-50">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-4 bg-[#1C96AD] rounded-2xl">
-              <FaBriefcase className="h-6 w-6 text-white" />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      
+
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Professional Experiences Section */}
+        <Card className="mb-6 shadow-lg">
+          <SectionHeader title="Professional Experiences" sectionKey="professionalExperiences" icon={<FaBuilding className="text-white text-sm" />} />
+          {expandedSections.professionalExperiences && (
+            <div className="p-6">
+              {experiences.map((exp) => (
+                <div key={exp.id} className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Company</span>
+                      </label>
+                      <div className="text-gray-800 font-medium">{exp.company}</div>
+                    </div>
+                    <div>
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Position</span>
+                      </label>
+                      <div className="text-gray-800 font-medium">{exp.position}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Responsibilities</span>
+                    </label>
+                    <div className="text-gray-700 text-sm leading-relaxed">{exp.responsibilities}</div>
+                  </div>
+                </div>
+              ))}
+
+              {isAddingExperience && (
+                <div className="border-t pt-6 mt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Position</span>
+                      </label>
+                      <input type="text" value={newExperience.position} onChange={(e) => setNewExperience({ ...newExperience, position: e.target.value })} placeholder="Position is here" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
+                    </div>
+                    <div>
+                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Company</span>
+                      </label>
+                      <input type="text" value={newExperience.company} onChange={(e) => setNewExperience({ ...newExperience, company: e.target.value })} placeholder="Company name is here" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2 text-sm font-medium text-gray-600 mb-2">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Responsibilities</span>
+                    </label>
+                    <textarea value={newExperience.responsibilities} onChange={(e) => setNewExperience({ ...newExperience, responsibilities: e.target.value })} placeholder="Add description" rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent" />
+                  </div>
+                  <div className="flex space-x-3 mt-4">
+                    <button onClick={handleAddExperience} className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">Save</button>
+                    <button onClick={() => setIsAddingExperience(false)} className="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {!isAddingExperience && (
+                <button onClick={() => setIsAddingExperience(true)} className="w-full mt-6 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg hover:border-teal-400 hover:bg-teal-50 transition-all flex items-center justify-center space-x-2">
+                  <FaPlus />
+                  <span>Add new Professional Experience</span>
+                </button>
+              )}
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Objectifs de carrière</h2>
-          </div>
-
-          <div className="space-y-6">
-            <FormField
-              label="Poste recherché"
-              icon={FaBriefcase}
-              value={formData.desiredPosition}
-              onChange={(value) => setFormData({...formData, desiredPosition: value})}
-              readOnly={!isEditing}
-            />
-            
-            <FormField
-              label="Localisation préférée"
-              icon={FaMapMarkerAlt}
-              value={formData.preferredLocation}
-              onChange={(value) => setFormData({...formData, preferredLocation: value})}
-              readOnly={!isEditing}
-            />
-
-            <FormField
-              label="Attentes salariales"
-              icon={FaDollarSign}
-              value={formData.salaryExpectation}
-              onChange={(value) => setFormData({...formData, salaryExpectation: value})}
-              readOnly={!isEditing}
-            />
-          </div>
+          )}
         </Card>
 
-        <Card className="p-8 shadow-lg border-0 bg-gradient-to-br from-emerald-50 to-teal-50">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-4 bg-emerald-500 rounded-2xl">
-              <FaClock className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">Conditions de travail</h2>
-          </div>
-
-          <div className="space-y-6">
-            <FormField
-              label="Type de contrat"
-              icon={FaBriefcase}
-              value={formData.jobType}
-              onChange={(value) => setFormData({...formData, jobType: value})}
-              readOnly={!isEditing}
-            />
-
-            <FormField
-              label="Mode de travail"
-              icon={FaMapMarkerAlt}
-              value={formData.workMode}
-              onChange={(value) => setFormData({...formData, workMode: value})}
-              readOnly={!isEditing}
-            />
-
-            <FormField
-              label="Disponibilité"
-              icon={FaClock}
-              value={formData.availability}
-              onChange={(value) => setFormData({...formData, availability: value})}
-              readOnly={!isEditing}
-            />
-          </div>
-        </Card>
-      </div>
-
-      {/* Secteurs d'activité et compétences */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-8 shadow-lg">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <FaGraduationCap className="text-[#1C96AD]" />
-            Secteurs d'intérêt
-          </h3>
-          <TextAreaField
-            value={formData.industries}
-            onChange={(value) => setFormData({...formData, industries: value})}
-            readOnly={!isEditing}
-            placeholder="Ex: Tech, Fintech, E-commerce..."
-          />
-        </Card>
-
-        <Card className="p-8 shadow-lg">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <FaUser className="text-[#1C96AD]" />
-            Compétences clés
-          </h3>
-          <TextAreaField
-            value={formData.skills}
-            onChange={(value) => setFormData({...formData, skills: value})}
-            readOnly={!isEditing}
-            placeholder="Ex: React, Node.js, TypeScript..."
-          />
-        </Card>
-      </div>
-
-      {/* Préférences de poste sauvegardées */}
-      <Card className="p-8 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold flex items-center gap-3">
-            <FaBriefcase className="text-[#1C96AD]" />
-            Préférences sauvegardées
-          </h3>
-          <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all">
-            <FaPlus />
-            Ajouter
-          </button>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {preferences.map((pref) => (
-            <div key={pref.id} className="p-6 bg-gray-50 rounded-xl border border-gray-200">
-              <h4 className="font-semibold text-lg mb-2">{pref.title}</h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                <p className="flex items-center gap-2">
-                  <FaMapMarkerAlt /> {pref.location}
-                </p>
-                <p className="flex items-center gap-2">
-                  <FaDollarSign /> {pref.salaryRange}
-                </p>
-                <p className="flex items-center gap-2">
-                  <FaBriefcase /> {pref.jobType} • {pref.industry}
-                </p>
+        {/* Grid for Education, Competences, Skills, Soft Skills, Languages */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Education */}
+          <Card className="shadow-lg">
+            <SectionHeader title="Education" sectionKey="education" icon={<span className="text-white text-xs">🎓</span>} />
+            {expandedSections.education && (
+              <div className="p-4 space-y-3">
+                {education.map((edu) => (
+                  <div key={edu.id} className="space-y-2">
+                    <div>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">School</span>
+                      <div className="mt-1 text-sm">{edu.school}</div>
+                    </div>
+                    <div>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Certificate</span>
+                      <div className="mt-1 text-sm">{edu.certificate}</div>
+                    </div>
+                  </div>
+                ))}
+                <button className="w-full mt-3 px-3 py-2 bg-teal-500 text-white rounded-lg text-sm hover:bg-teal-600 transition-colors">Save</button>
               </div>
-            </div>
-          ))}
+            )}
+          </Card>
+
+          {/* Competences */}
+          <Card className="shadow-lg">
+            <SectionHeader title="Competences" sectionKey="competences" icon={<span className="text-white text-xs">⚡</span>} />
+            {expandedSections.competences && (
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {competences.map((comp, index) => (
+                    <div key={index} className={`px-2 py-1 rounded text-xs border ${getLevelColor(comp.level)}`}>{comp.name}</div>
+                  ))}
+                </div>
+                <button className="flex items-center space-x-2 text-teal-600 text-sm hover:bg-teal-50 px-2 py-1 rounded">
+                  <FaPlus className="text-xs" />
+                  <span>Add New Competence</span>
+                </button>
+              </div>
+            )}
+          </Card>
+
+          {/* Skills */}
+          <Card className="shadow-lg">
+            <SectionHeader title="Skills" sectionKey="skills" icon={<span className="text-white text-xs">⭐</span>} />
+            {expandedSections.skills && (
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {skills.map((skill, index) => (
+                    <div key={index} className={`px-2 py-1 rounded text-xs border ${getLevelColor(skill.level)}`}>{skill.name}</div>
+                  ))}
+                </div>
+                <button className="flex items-center space-x-2 text-teal-600 text-sm hover:bg-teal-50 px-2 py-1 rounded">
+                  <FaPlus className="text-xs" />
+                  <span>Add New Skill</span>
+                </button>
+              </div>
+            )}
+          </Card>
+
+          {/* Soft Skills */}
+          <Card className="shadow-lg">
+            <SectionHeader title="Soft Skills" sectionKey="softSkills" icon={<span className="text-white text-xs">🔧</span>} />
+            {expandedSections.softSkills && (
+              <div className="p-4">
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {softSkills.map((skill, index) => (
+                    <div key={index} className={`px-2 py-1 rounded text-xs border ${getLevelColor(skill.level)}`}>{skill.name}</div>
+                  ))}
+                </div>
+                <button className="flex items-center space-x-2 text-teal-600 text-sm hover:bg-teal-50 px-2 py-1 rounded">
+                  <FaPlus className="text-xs" />
+                  <span>Add New Soft Skill</span>
+                </button>
+              </div>
+            )}
+          </Card>
+
+          {/* Languages */}
+          <Card className="shadow-lg">
+            <SectionHeader title="Languages" sectionKey="languages" icon={<span className="text-white text-xs">🌐</span>} />
+            {expandedSections.languages && (
+              <div className="p-4 space-y-2 mb-3">
+                {languages.map((lang, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">{lang.name}</span>
+                    <select className="text-xs border border-gray-300 rounded px-2 py-1">
+                      <option value={lang.level}>{lang.level}</option>
+                      <option value="Basic">Basic</option>
+                      <option value="Fluent">Fluent</option>
+                      <option value="Native">Native</option>
+                    </select>
+                  </div>
+                ))}
+                <button className="flex items-center space-x-2 text-teal-600 text-sm hover:bg-teal-50 px-2 py-1 rounded">
+                  <FaPlus className="text-xs" />
+                  <span>Add New Language</span>
+                </button>
+              </div>
+            )}
+          </Card>
         </div>
-      </Card>
 
-      {/* Boutons d'action */}
-      {isEditing && (
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={handleSave}
-            className="flex items-center gap-2 px-8 py-3 bg-[#1C96AD] text-white rounded-xl hover:bg-[#178496] transition-all shadow-lg"
-          >
-            <FaSave />
-            Enregistrer les modifications
-          </button>
-          <button
-            onClick={handleCancel}
-            className="flex items-center gap-2 px-8 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all"
-          >
-            <FaTimes />
-            Annuler
-          </button>
-        </div>
-      )}
+        
+      </div>
     </div>
-  );
-}
-
-interface FormFieldProps {
-  label: string;
-  icon: React.ComponentType<any>;
-  value: string;
-  onChange: (value: string) => void;
-  readOnly: boolean;
-}
-
-function FormField({ label, icon: Icon, value, onChange, readOnly }: FormFieldProps) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-        <Icon className="text-[#1C96AD]" />
-        {label}
-      </label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        readOnly={readOnly}
-        className={`w-full border border-gray-200 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C96AD] focus:border-transparent transition-all ${
-          readOnly ? "opacity-70 cursor-not-allowed bg-gray-50" : ""
-        }`}
-      />
-    </div>
-  );
-}
-
-interface TextAreaFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-  readOnly: boolean;
-  placeholder?: string;
-}
-
-function TextAreaField({ value, onChange, readOnly, placeholder }: TextAreaFieldProps) {
-  return (
-    <textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      readOnly={readOnly}
-      placeholder={placeholder}
-      rows={4}
-      className={`w-full border border-gray-200 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C96AD] focus:border-transparent transition-all resize-none ${
-        readOnly ? "opacity-70 cursor-not-allowed bg-gray-50" : ""
-      }`}
-    />
   );
 }
