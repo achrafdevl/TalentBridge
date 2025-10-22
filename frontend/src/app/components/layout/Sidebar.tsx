@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAppDispatch } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { logout } from "../../../redux/slices/authSlice";
 import {
   FaTachometerAlt,
@@ -63,6 +63,7 @@ export default function Sidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth); // ✅ current user
 
   const normalize = (p?: string) =>
     (p || "/").toLowerCase().replace(/\/+$/g, "") || "/";
@@ -89,7 +90,6 @@ export default function Sidebar() {
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              {/* <FaBriefcase className="w-5 h-5 text-white" /> */}
               <Image src="/Logo.png" alt="TalentBridge" width={200} height={200} />
             </div>
             <div>
@@ -147,7 +147,6 @@ export default function Sidebar() {
                     <>
                       <span className="flex-1">{item.title}</span>
 
-                      {/* Badge de notification */}
                       {item.badge && (
                         <span
                           className={cn(
@@ -161,7 +160,6 @@ export default function Sidebar() {
                         </span>
                       )}
 
-                      {/* Flèche pour sous-menus */}
                       {hasSubItems && (
                         <button
                           onClick={(e) => {
@@ -214,14 +212,28 @@ export default function Sidebar() {
 
       {/* Section utilisateur et déconnexion */}
       <div className="border-t border-white/10 p-4 space-y-3">
-        {!collapsed && (
+        {!collapsed && user && (
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <FaUser className="w-4 h-4" />
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
+              {user?.profile_image ? (
+                <Image
+                  src={user.profile_image}
+                  alt={user.full_name}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <FaUser className="w-4 h-4" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">John Doe</p>
-              <p className="text-xs opacity-75 truncate">john.doe@email.com</p>
+              <p className="text-sm font-semibold truncate">
+                {user?.full_name}
+              </p>
+              <p className="text-xs opacity-75 truncate">
+                {user?.email}
+              </p>
             </div>
           </div>
         )}

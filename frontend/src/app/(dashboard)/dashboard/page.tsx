@@ -20,7 +20,7 @@ import {
   FaArrowDown,
   FaCalendar,
   FaBuilding,
-  FaBell
+  FaBell,
 } from "react-icons/fa";
 
 const stats = [
@@ -32,7 +32,7 @@ const stats = [
     trendUp: true,
     color: "from-blue-500 to-blue-600",
     bgColor: "from-blue-50 to-blue-100",
-    description: "Ce mois-ci"
+    description: "Ce mois-ci",
   },
   {
     title: "Offres actives",
@@ -42,7 +42,7 @@ const stats = [
     trendUp: true,
     color: "from-emerald-500 to-emerald-600",
     bgColor: "from-emerald-50 to-emerald-100",
-    description: "Nouvelles cette semaine"
+    description: "Nouvelles cette semaine",
   },
   {
     title: "Vues profil",
@@ -52,7 +52,7 @@ const stats = [
     trendUp: true,
     color: "from-purple-500 to-purple-600",
     bgColor: "from-purple-50 to-purple-100",
-    description: "Ce mois-ci"
+    description: "Ce mois-ci",
   },
   {
     title: "Taux de réussite",
@@ -62,7 +62,7 @@ const stats = [
     trendUp: true,
     color: "from-orange-500 to-orange-600",
     bgColor: "from-orange-50 to-orange-100",
-    description: "Candidatures acceptées"
+    description: "Candidatures acceptées",
   },
 ];
 
@@ -74,7 +74,7 @@ const recentActivities = [
     time: "Il y a 2 heures",
     type: "application",
     status: "En attente",
-    statusColor: "bg-yellow-100 text-yellow-700"
+    statusColor: "bg-yellow-100 text-yellow-700",
   },
   {
     id: 2,
@@ -83,7 +83,7 @@ const recentActivities = [
     time: "Il y a 5 heures",
     type: "view",
     status: "Nouveau",
-    statusColor: "bg-blue-100 text-blue-700"
+    statusColor: "bg-blue-100 text-blue-700",
   },
   {
     id: 3,
@@ -92,7 +92,7 @@ const recentActivities = [
     time: "Il y a 1 jour",
     type: "cv",
     status: "Terminé",
-    statusColor: "bg-green-100 text-green-700"
+    statusColor: "bg-green-100 text-green-700",
   },
   {
     id: 4,
@@ -101,7 +101,7 @@ const recentActivities = [
     time: "Il y a 2 jours",
     type: "interview",
     status: "Confirmé",
-    statusColor: "bg-purple-100 text-purple-700"
+    statusColor: "bg-purple-100 text-purple-700",
   },
   {
     id: 5,
@@ -110,8 +110,8 @@ const recentActivities = [
     time: "Il y a 3 jours",
     type: "favorite",
     status: "Sauvegardé",
-    statusColor: "bg-pink-100 text-pink-700"
-  }
+    statusColor: "bg-pink-100 text-pink-700",
+  },
 ];
 
 const upcomingTasks = [
@@ -120,22 +120,22 @@ const upcomingTasks = [
     title: "Entretien technique - TechCorp",
     date: "Demain 14h00",
     type: "interview",
-    priority: "high"
+    priority: "high",
   },
   {
     id: 2,
     title: "Suivi candidature - StartupXYZ",
     date: "Vendredi 10h00",
     type: "follow-up",
-    priority: "medium"
+    priority: "medium",
   },
   {
     id: 3,
     title: "Mettre à jour le CV",
     date: "Ce weekend",
     type: "task",
-    priority: "low"
-  }
+    priority: "low",
+  },
 ];
 
 const jobRecommendations = [
@@ -146,17 +146,17 @@ const jobRecommendations = [
     location: "Paris, France",
     match: "95%",
     salary: "65k - 80k €",
-    posted: "Il y a 2 jours"
+    posted: "Il y a 2 jours",
   },
   {
     id: 2,
     title: "Lead Frontend Engineer",
     company: "DigitalCorp",
-    location: "Lyon, France", 
+    location: "Lyon, France",
     match: "89%",
     salary: "55k - 70k €",
-    posted: "Il y a 4 jours"
-  }
+    posted: "Il y a 4 jours",
+  },
 ];
 
 export default function Dashboard() {
@@ -199,19 +199,20 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-[#1C96AD] to-blue-600 bg-clip-text text-transparent">
-            {getGreeting()}, {user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'} !
+            {getGreeting()},{" "}
+            {user?.full_name || user?.email?.split("@")[0] || "Utilisateur"} !
           </h1>
           <p className="text-gray-600 mt-2 flex items-center gap-2">
             <FaCalendar className="text-[#1C96AD]" />
-            {currentTime.toLocaleDateString("fr-FR", { 
-              weekday: 'long',
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            {currentTime.toLocaleDateString("fr-FR", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <button className="relative p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all">
             <FaBell className="text-[#1C96AD]" />
@@ -230,23 +231,42 @@ export default function Dashboard() {
         {stats.map((stat) => {
           const StatIcon = stat.icon;
           return (
-            <Card key={stat.title} className="p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white">
+            <Card
+              key={stat.title}
+              className="p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-white"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</p>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {stat.title}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900 mb-1">
+                    {stat.value}
+                  </p>
                   <div className="flex items-center gap-2">
-                    <span className={`flex items-center text-sm font-medium ${
-                      stat.trendUp ? "text-emerald-600" : "text-red-600"
-                    }`}>
-                      {stat.trendUp ? <FaArrowUp className="mr-1" /> : <FaArrowDown className="mr-1" />}
+                    <span
+                      className={`flex items-center text-sm font-medium ${
+                        stat.trendUp ? "text-emerald-600" : "text-red-600"
+                      }`}
+                    >
+                      {stat.trendUp ? (
+                        <FaArrowUp className="mr-1" />
+                      ) : (
+                        <FaArrowDown className="mr-1" />
+                      )}
                       {stat.trend}
                     </span>
-                    <span className="text-xs text-gray-500">{stat.description}</span>
+                    <span className="text-xs text-gray-500">
+                      {stat.description}
+                    </span>
                   </div>
                 </div>
-                <div className={`p-4 rounded-2xl bg-gradient-to-br ${stat.bgColor} shadow-inner`}>
-                  <StatIcon className={`h-8 w-8 bg-gradient-to-br ${stat.color} bg-clip-text text-transparent`} />
+                <div
+                  className={`p-4 rounded-2xl bg-gradient-to-br ${stat.bgColor} shadow-inner`}
+                >
+                  <StatIcon
+                    className={`h-8 w-8 bg-gradient-to-br ${stat.color} bg-clip-text text-transparent`}
+                  />
                 </div>
               </div>
             </Card>
@@ -267,38 +287,55 @@ export default function Dashboard() {
               Voir tout
             </button>
           </div>
-          
+
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {recentActivities.map((activity) => {
-              const ActivityIcon = 
-                activity.type === "application" ? FaFileAlt :
-                activity.type === "view" ? FaEye :
-                activity.type === "cv" ? FaRocket :
-                activity.type === "interview" ? FaUser :
-                FaHeart;
-              
+              const ActivityIcon =
+                activity.type === "application"
+                  ? FaFileAlt
+                  : activity.type === "view"
+                  ? FaEye
+                  : activity.type === "cv"
+                  ? FaRocket
+                  : activity.type === "interview"
+                  ? FaUser
+                  : FaHeart;
+
               return (
-                <div key={activity.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
-                  <div className={`h-12 w-12 flex items-center justify-center rounded-full ${
-                    activity.type === "application" ? "bg-blue-100 text-blue-600" :
-                    activity.type === "view" ? "bg-green-100 text-green-600" :
-                    activity.type === "cv" ? "bg-purple-100 text-purple-600" :
-                    activity.type === "interview" ? "bg-orange-100 text-orange-600" :
-                    "bg-pink-100 text-pink-600"
-                  }`}>
+                <div
+                  key={activity.id}
+                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer"
+                >
+                  <div
+                    className={`h-12 w-12 flex items-center justify-center rounded-full ${
+                      activity.type === "application"
+                        ? "bg-blue-100 text-blue-600"
+                        : activity.type === "view"
+                        ? "bg-green-100 text-green-600"
+                        : activity.type === "cv"
+                        ? "bg-purple-100 text-purple-600"
+                        : activity.type === "interview"
+                        ? "bg-orange-100 text-orange-600"
+                        : "bg-pink-100 text-pink-600"
+                    }`}
+                  >
                     <ActivityIcon className="h-5 w-5" />
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{activity.title}</p>
+                    <p className="font-semibold text-gray-900 truncate">
+                      {activity.title}
+                    </p>
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <FaBuilding className="h-3 w-3" />
                       {activity.company}
                     </p>
                     <p className="text-xs text-gray-500">{activity.time}</p>
                   </div>
-                  
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${activity.statusColor}`}>
+
+                  <div
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${activity.statusColor}`}
+                  >
                     {activity.status}
                   </div>
                 </div>
@@ -338,19 +375,27 @@ export default function Dashboard() {
           {/* Tâches à venir */}
           <Card className="p-6 shadow-lg border-0 bg-white">
             <h3 className="text-xl font-bold mb-6 text-gray-900 flex items-center gap-3">
-              <FaCalendar className="text-[#1C96AD]" />
-              À venir
+              <FaCalendar className="text-[#1C96AD]" />À venir
             </h3>
             <div className="space-y-3">
               {upcomingTasks.map((task) => (
-                <div key={task.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className={`w-3 h-3 rounded-full ${
-                    task.priority === "high" ? "bg-red-500" :
-                    task.priority === "medium" ? "bg-yellow-500" :
-                    "bg-green-500"
-                  }`}></div>
+                <div
+                  key={task.id}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      task.priority === "high"
+                        ? "bg-red-500"
+                        : task.priority === "medium"
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`}
+                  ></div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{task.title}</p>
+                    <p className="font-semibold text-sm text-gray-900 truncate">
+                      {task.title}
+                    </p>
                     <p className="text-xs text-gray-500">{task.date}</p>
                   </div>
                 </div>
@@ -371,13 +416,18 @@ export default function Dashboard() {
             Voir toutes les recommandations
           </button>
         </div>
-        
+
         <div className="grid gap-6 md:grid-cols-2">
           {jobRecommendations.map((job) => (
-            <div key={job.id} className="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all cursor-pointer">
+            <div
+              key={job.id}
+              className="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition-all cursor-pointer"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg text-gray-900 mb-2">{job.title}</h4>
+                  <h4 className="font-bold text-lg text-gray-900 mb-2">
+                    {job.title}
+                  </h4>
                   <p className="text-gray-600 flex items-center gap-2 mb-1">
                     <FaBuilding className="h-4 w-4" />
                     {job.company}
@@ -392,9 +442,11 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-[#1C96AD]">{job.salary}</span>
+                <span className="font-semibold text-[#1C96AD]">
+                  {job.salary}
+                </span>
                 <button className="px-4 py-2 bg-[#1C96AD] text-white rounded-lg hover:bg-[#178496] transition-all">
-                  Voir l'offre
+                  Voir l&apos;offre
                 </button>
               </div>
             </div>

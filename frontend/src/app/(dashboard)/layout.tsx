@@ -14,14 +14,11 @@ export default function DashboardLayout({
   const { token, loading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    // Only redirect if we're not loading and there's no token
     if (!loading && !token) {
-      console.log("Dashboard layout - No token, redirecting to login");
       router.push("/login");
     }
   }, [token, loading, router]);
 
-  // Show loading or nothing while checking authentication
   if (loading || !token) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -34,9 +31,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="h-screen flex bg-gray-50 overflow-hidden">
       <Sidebar />
-      <main className="flex-1 p-6 lg:p-8 space-y-8 overflow-y-auto">
+      <main className="flex-1 h-screen overflow-y-auto p-6 lg:p-8 space-y-8">
         {children}
       </main>
     </div>
