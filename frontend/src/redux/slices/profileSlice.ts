@@ -1,150 +1,7 @@
-<<<<<<< HEAD
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-=======
-// import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-// export interface Language {
-//   name: string;
-//   level: string;
-// }
-
-// export interface Experience {
-//   id: string;
-//   company: string;
-//   position: string;
-//   responsibilities: string;
-// }
-
-// export interface Education {
-//   id: string;
-//   school: string;
-//   certificate: string;
-// }
-
-// export interface SkillItem {
-//   name: string;
-//   level: number;
-// }
-
-// interface ProfileState {
-//   competences: SkillItem[];
-//   skills: SkillItem[];
-//   softSkills: SkillItem[];
-//   languages: Language[];
-//   experiences: Experience[];
-//   education: Education[];
-// }
-
-// const initialState: ProfileState = {
-//   competences: [
-//     { name: "Branding", level: 2 },
-//     { name: "Web Development", level: 2 },
-//   ],
-//   skills: [
-//     { name: "UI Design", level: 1 },
-//     { name: "3D Design", level: 2 },
-//   ],
-//   softSkills: [
-//     { name: "Creativity", level: 2 },
-//     { name: "Adaptability", level: 1 },
-//   ],
-//   languages: [
-//     { name: "Arabic", level: "Native" },
-//     { name: "English", level: "Fluent" },
-//   ],
-//   experiences: [
-//     {
-//       id: "1",
-//       company: "Eco Habitat Lux Inc.",
-//       position: "Creative Art Director",
-//       responsibilities: "Successfully increased annual revenue...",
-//     },
-//   ],
-//   education: [
-//     { id: "1", school: "University Hassan 2", certificate: "Master of Multimedia Design & Development" },
-//   ],
-// };
-
-// export const profileSlice = createSlice({
-//   name: "profile",
-//   initialState,
-//   reducers: {
-//     // ------------------ Experiences ------------------
-//     addExperience: (state, action: PayloadAction<Experience>) => {
-//       state.experiences.push(action.payload);
-//     },
-//     updateExperience: (state, action: PayloadAction<{ id: string; data: Partial<Experience> }>) => {
-//       const index = state.experiences.findIndex(exp => exp.id === action.payload.id);
-//       if (index !== -1) {
-//         state.experiences[index] = { ...state.experiences[index], ...action.payload.data };
-//       }
-//     },
-//     removeExperience: (state, action: PayloadAction<string>) => {
-//       state.experiences = state.experiences.filter(exp => exp.id !== action.payload);
-//     },
-
-//     // ------------------ Education ------------------
-//     addEducation: (state, action: PayloadAction<Education>) => {
-//       state.education.push(action.payload);
-//     },
-//     updateEducation: (state, action: PayloadAction<{ id: string; data: Partial<Education> }>) => {
-//       const index = state.education.findIndex(edu => edu.id === action.payload.id);
-//       if (index !== -1) {
-//         state.education[index] = { ...state.education[index], ...action.payload.data };
-//       }
-//     },
-//     removeEducation: (state, action: PayloadAction<string>) => {
-//       state.education = state.education.filter(edu => edu.id !== action.payload);
-//     },
-
-//     // ------------------ Competences / Skills / SoftSkills ------------------
-//     addItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; item: SkillItem }>) => {
-//       state[action.payload.field].push(action.payload.item);
-//     },
-//     updateItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number; item: SkillItem }>) => {
-//       const { field, index, item } = action.payload;
-//       if (state[field][index]) state[field][index] = item;
-//     },
-//     removeItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number }>) => {
-//       const { field, index } = action.payload;
-//       state[field].splice(index, 1);
-//     },
-
-//     // ------------------ Languages ------------------
-//     addLanguage: (state, action: PayloadAction<Language>) => {
-//       state.languages.push(action.payload);
-//     },
-//     updateLanguage: (state, action: PayloadAction<{ index: number; language: Language }>) => {
-//       const { index, language } = action.payload;
-//       if (state.languages[index]) state.languages[index] = language;
-//     },
-//     removeLanguage: (state, action: PayloadAction<number>) => {
-//       state.languages.splice(action.payload, 1);
-//     },
-//   },
-// });
-
-// export const {
-//   addExperience,
-//   updateExperience,
-//   removeExperience,
-//   addEducation,
-//   updateEducation,
-//   removeEducation,
-//   addItem,
-//   updateItem,
-//   removeItem,
-//   addLanguage,
-//   updateLanguage,
-//   removeLanguage,
-// } = profileSlice.actions;
-
-// export default profileSlice.reducer;
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // ==================== INTERFACES ====================
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
+
 export interface Language {
   name: string;
   level: string;
@@ -154,27 +11,20 @@ export interface Experience {
   id: string;
   company: string;
   position: string;
-<<<<<<< HEAD
-  responsibilities: string;
-=======
   location: string;
   startDate: string;
   endDate: string;
   responsibilities: string;
   technologies?: string[];
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
 }
 
 export interface Education {
   id: string;
   school: string;
   certificate: string;
-<<<<<<< HEAD
-=======
   startDate?: string;
   endDate?: string;
   location?: string;
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
 }
 
 export interface SkillItem {
@@ -182,9 +32,6 @@ export interface SkillItem {
   level: number;
 }
 
-<<<<<<< HEAD
-interface ProfileState {
-=======
 export interface Certification {
   id: string;
   title: string;
@@ -230,20 +77,15 @@ export interface UserProfile {
 }
 
 // ==================== STATE ====================
+
 interface ProfileState {
   userProfile: UserProfile;
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
   competences: SkillItem[];
   skills: SkillItem[];
   softSkills: SkillItem[];
   languages: Language[];
   experiences: Experience[];
   education: Education[];
-<<<<<<< HEAD
-}
-
-const initialState: ProfileState = {
-=======
   certifications: Certification[];
   projects: Project[];
   technologies: Technology[];
@@ -258,7 +100,6 @@ const initialState: ProfileState = {
     profileImage: "",
     socialLinks: {},
   },
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
   competences: [
     { name: "Branding", level: 2 },
     { name: "Web Development", level: 2 },
@@ -275,21 +116,6 @@ const initialState: ProfileState = {
     { name: "Arabic", level: "Native" },
     { name: "English", level: "Fluent" },
   ],
-<<<<<<< HEAD
-  experiences: [
-    {
-      id: "1",
-      company: "Eco Habitat Lux Inc.",
-      position: "Creative Art Director",
-      responsibilities: "Successfully increased annual revenue...",
-    },
-  ],
-  education: [
-    { id: "1", school: "University Hassan 2", certificate: "Master of Multimedia Design & Development" },
-  ],
-};
-
-=======
   experiences: [],
   education: [],
   certifications: [],
@@ -298,39 +124,28 @@ const initialState: ProfileState = {
 };
 
 // ==================== SLICE ====================
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
+
 export const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
-<<<<<<< HEAD
-=======
     // ------------------ User Profile ------------------
     updateUserProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
       state.userProfile = { ...state.userProfile, ...action.payload };
     },
 
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
     // ------------------ Experiences ------------------
     addExperience: (state, action: PayloadAction<Experience>) => {
       state.experiences.push(action.payload);
     },
     updateExperience: (state, action: PayloadAction<{ id: string; data: Partial<Experience> }>) => {
-<<<<<<< HEAD
-      const index = state.experiences.findIndex(exp => exp.id === action.payload.id);
-=======
       const index = state.experiences.findIndex((exp) => exp.id === action.payload.id);
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
       if (index !== -1) {
         state.experiences[index] = { ...state.experiences[index], ...action.payload.data };
       }
     },
     removeExperience: (state, action: PayloadAction<string>) => {
-<<<<<<< HEAD
-      state.experiences = state.experiences.filter(exp => exp.id !== action.payload);
-=======
       state.experiences = state.experiences.filter((exp) => exp.id !== action.payload);
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
     },
 
     // ------------------ Education ------------------
@@ -338,30 +153,12 @@ export const profileSlice = createSlice({
       state.education.push(action.payload);
     },
     updateEducation: (state, action: PayloadAction<{ id: string; data: Partial<Education> }>) => {
-<<<<<<< HEAD
-      const index = state.education.findIndex(edu => edu.id === action.payload.id);
-=======
       const index = state.education.findIndex((edu) => edu.id === action.payload.id);
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
       if (index !== -1) {
         state.education[index] = { ...state.education[index], ...action.payload.data };
       }
     },
     removeEducation: (state, action: PayloadAction<string>) => {
-<<<<<<< HEAD
-      state.education = state.education.filter(edu => edu.id !== action.payload);
-    },
-
-    // ------------------ Competences / Skills / SoftSkills ------------------
-    addItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; item: SkillItem }>) => {
-      state[action.payload.field].push(action.payload.item);
-    },
-    updateItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number; item: SkillItem }>) => {
-      const { field, index, item } = action.payload;
-      if (state[field][index]) state[field][index] = item;
-    },
-    removeItem: (state, action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number }>) => {
-=======
       state.education = state.education.filter((edu) => edu.id !== action.payload);
     },
 
@@ -416,11 +213,7 @@ export const profileSlice = createSlice({
     },
     updateItem: (
       state,
-      action: PayloadAction<{
-        field: "competences" | "skills" | "softSkills";
-        index: number;
-        item: SkillItem;
-      }>
+      action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number; item: SkillItem }>
     ) => {
       const { field, index, item } = action.payload;
       if (state[field][index]) state[field][index] = item;
@@ -429,7 +222,6 @@ export const profileSlice = createSlice({
       state,
       action: PayloadAction<{ field: "competences" | "skills" | "softSkills"; index: number }>
     ) => {
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
       const { field, index } = action.payload;
       state[field].splice(index, 1);
     },
@@ -449,18 +241,13 @@ export const profileSlice = createSlice({
 });
 
 export const {
-<<<<<<< HEAD
-=======
   updateUserProfile,
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
   addExperience,
   updateExperience,
   removeExperience,
   addEducation,
   updateEducation,
   removeEducation,
-<<<<<<< HEAD
-=======
   addCertification,
   updateCertification,
   removeCertification,
@@ -470,7 +257,6 @@ export const {
   addTechnology,
   updateTechnology,
   removeTechnology,
->>>>>>> 53e3677 (Refactor profile components and handle current user in sidebar)
   addItem,
   updateItem,
   removeItem,
