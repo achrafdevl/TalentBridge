@@ -1,106 +1,60 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import List
+# app/routes/certification_routes.py
+from fastapi import APIRouter, HTTPException, Depends
+from ..models.cvProfile import Certification, CertificationInDB
+from ..database import certifications_collection
+from ..auth.dependencies import get_current_user
 from bson import ObjectId
-from app.models.certification import CertificationCreate, CertificationResponse
-from app.database import certifications_collection
-from app.auth.jwt_handler import verify_access_token
-from datetime import datetime, date
 
 router = APIRouter(prefix="/certifications", tags=["Certifications"])
 
+@router.post("/", response_model=CertificationInDB, status_code=201)
+async def create_certification(cert: Certification, current_user: dict = Depends(get_current_user)):
+    cert_data = cert.dict()
+    cert_data["user_id"] = str(current_user["_id"])
+    result = await certifications_collection.insert_one(cert_data)
+    
+    # Convert MongoDB _id to id string
+    cert_data["id"] = str(result.inserted_id)
+    return CertificationInDB(**cert_data)
 
-# Utility function to convert MongoDB ObjectId to string
-def serialize_id(doc: dict) -> dict:
-    if "_id" in doc:
-        doc["_id"] = str(doc["_id"])
-    if "user_id" in doc and isinstance(doc["user_id"], ObjectId):
-        doc["user_id"] = str(doc["user_id"])
-    return doc
+@router.get("/", response_model=list[CertificationInDB])
+async def get_certifications(current_user: dict = Depends(get_current_user)):
+    certs = await certifications_collection.find({"user_id": str(current_user["_id"])}).to_list(None)
+    # Convert _id to id for each certification
+    return [CertificationInDB(
+        id=str(cert["_id"]),
+        user_id=cert["user_id"],
+        **{k: v for k, v in cert.items() if k not in ["_id", "user_id"]}
+    ) for cert in certs]
 
-
-# Dependency: Extract user from JWT token (passed as query parameter)
-def get_current_user(token: str = Query(..., description="JWT access token")) -> str:
-    payload = verify_access_token(token)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="User ID not found in token")
-
-    return user_id
-
-
-# Create
-
-@router.post("/", response_model=CertificationResponse)
-async def create_certification(
-    cert: CertificationCreate,
-    user_id: str = Depends(get_current_user)
-):
-    cert_dict = cert.dict()
-
-    # Convert `date` (issue_date) to `datetime`
-    if isinstance(cert_dict.get("issue_date"), date):
-        cert_dict["issue_date"] = datetime.combine(cert_dict["issue_date"], datetime.min.time())
-
-    cert_dict["user_id"] = ObjectId(user_id)
-
-    result = await certifications_collection.insert_one(cert_dict)
-    created_cert = await certifications_collection.find_one({"_id": result.inserted_id})
-
-    if not created_cert:
-        raise HTTPException(status_code=500, detail="Failed to create certification")
-
-    return CertificationResponse(**serialize_id(created_cert))
-
-
-# Read
-@router.get("/", response_model=List[CertificationResponse])
-async def get_certifications(user_id: str = Depends(get_current_user)):
-    certs = []
-    async for cert in certifications_collection.find({"user_id": ObjectId(user_id)}):
-        certs.append(CertificationResponse(**serialize_id(cert)))
-    return certs
-
-
-# Update
-@router.put("/{certification_id}", response_model=CertificationResponse)
-async def update_certification(
-    certification_id: str,
-    cert_update: CertificationCreate,
-    user_id: str = Depends(get_current_user)
-):
-    if not ObjectId.is_valid(certification_id):
+@router.put("/{cert_id}", response_model=CertificationInDB)
+async def update_certification(cert_id: str, cert: Certification, current_user: dict = Depends(get_current_user)):
+    if not ObjectId.is_valid(cert_id):
         raise HTTPException(status_code=400, detail="Invalid certification ID")
 
-    update_data = {k: v for k, v in cert_update.dict().items() if v is not None}
-    result = await certifications_collection.update_one(
-        {"_id": ObjectId(certification_id), "user_id": ObjectId(user_id)},
-        {"$set": update_data}
+    updated = await certifications_collection.find_one_and_update(
+        {"_id": ObjectId(cert_id), "user_id": str(current_user["_id"])},
+        {"$set": cert.dict()},
+        return_document=True
     )
 
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Certification not found or not authorized to update")
+    if not updated:
+        raise HTTPException(status_code=404, detail="Certification not found")
 
-    updated_cert = await certifications_collection.find_one({"_id": ObjectId(certification_id)})
-    return CertificationResponse(**serialize_id(updated_cert))
+    # Convert _id to id
+    updated["id"] = str(updated.pop("_id"))
+    return CertificationInDB(**updated)
 
-
-# Delete
-@router.delete("/{certification_id}")
-async def delete_certification(
-    certification_id: str,
-    user_id: str = Depends(get_current_user)
-):
-    if not ObjectId.is_valid(certification_id):
+@router.delete("/{cert_id}")
+async def delete_certification(cert_id: str, current_user: dict = Depends(get_current_user)):
+    if not ObjectId.is_valid(cert_id):
         raise HTTPException(status_code=400, detail="Invalid certification ID")
 
     result = await certifications_collection.delete_one(
-        {"_id": ObjectId(certification_id), "user_id": ObjectId(user_id)}
+        {"_id": ObjectId(cert_id), "user_id": str(current_user["_id"])}
     )
 
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Certification not found or not authorized to delete")
+        raise HTTPException(status_code=404, detail="Certification not found")
 
-    return {"detail": "Certification deleted successfully"}
+    return {"message": "Certification deleted"}

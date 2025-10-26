@@ -1,48 +1,63 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
-import type { Competence } from "@/app/types/competence-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchCompetences,
+  createCompetence,
+  updateCompetence,
+  deleteCompetence,
+} from "@/redux/slices/cvProfileSlice";
+
+export interface Competence {
+  id?: string;
+  name: string;
+}
 
 export default function CompetenceSection() {
-  const [competences, setCompetences] = useState<Competence[]>([
-    { name: "Branding", level: 2 },
-    { name: "User Experience", level: 1 },
-    { name: "Graphic Design", level: 0 },
-    { name: "Motion Design", level: 1 },
-    { name: "Web Development", level: 2 },
-  ]);
+  const dispatch = useAppDispatch();
+  const { competences } = useAppSelector((state) => state.cvProfile);
 
   const emptyCompetence: Competence = {
     name: "",
-    level: 0,
   };
 
   const [newCompetence, setNewCompetence] = useState<Competence>({
     ...emptyCompetence,
   });
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingData, setEditingData] = useState<Competence | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchCompetences());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newCompetence.name) return;
-    setCompetences([...competences, newCompetence]);
+    await dispatch(createCompetence(newCompetence));
     setNewCompetence({ ...emptyCompetence });
     setIsAdding(false);
   };
 
-  const handleRemove = (index: number) => {
-    setCompetences(competences.filter((_, i) => i !== index));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteCompetence(id));
   };
 
-  const handleSaveEdit = (index: number, updated: Competence) => {
-    setCompetences(
-      competences.map((comp, i) => (i === index ? updated : comp))
-    );
-    setEditingIndex(null);
+  const handleSaveEdit = async (id: string, updated: Competence) => {
+    await dispatch(updateCompetence({ id, data: updated }));
+    setEditingId(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    const comp = competences.find((c) => c.id === id);
+    if (comp) setEditingData({ ...comp });
   };
 
   const getLevelColor = (level: number) => {
@@ -83,50 +98,37 @@ export default function CompetenceSection() {
         <div className="p-4 space-y-4">
           <div className="grid grid-cols-2 gap-2">
             {competences.map((c, idx) =>
-              editingIndex === idx ? (
+              editingId === c.id && editingData ? (
                 <div
-                  key={idx}
+                  key={c.id || idx}
                   className="col-span-2 border rounded p-3 space-y-2"
                 >
                   <input
                     type="text"
                     placeholder="Competence Name"
                     className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                    value={c.name}
+                    value={editingData.name}
                     onChange={(e) =>
-                      setCompetences((prev) =>
-                        prev.map((item, i) =>
-                          i === idx ? { ...item, name: e.target.value } : item
-                        )
-                      )
+                      setEditingData({ ...editingData, name: e.target.value })
                     }
                   />
-                  <select
-                    value={c.level}
-                    className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                    onChange={(e) =>
-                      setCompetences((prev) =>
-                        prev.map((item, i) =>
-                          i === idx
-                            ? { ...item, level: parseInt(e.target.value) }
-                            : item
-                        )
-                      )
-                    }
-                  >
-                    <option value={0}>Beginner</option>
-                    <option value={1}>Intermediate</option>
-                    <option value={2}>Expert</option>
-                  </select>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleSaveEdit(idx, c)}
+                      onClick={() => {
+                        if (editingData.id) {
+                          const { id, ...data } = editingData;
+                          handleSaveEdit(id, data);
+                        }
+                      }}
                       className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
                     >
                       Save
                     </button>
                     <button
-                      onClick={() => setEditingIndex(null)}
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditingData(null);
+                      }}
                       className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
                     >
                       Cancel
@@ -135,26 +137,23 @@ export default function CompetenceSection() {
                 </div>
               ) : (
                 <div
-                  key={idx}
+                  key={c.id || idx}
                   className={`px-2 py-1 rounded text-xs border relative group ${getLevelColor(
-                    c.level
+                    0
                   )}`}
                 >
                   <div className="flex justify-between items-center">
                     <span>{c.name}</span>
-                    <span className="text-[10px] opacity-70">
-                      {getLevelLabel(c.level)}
-                    </span>
                   </div>
                   <div className="absolute top-0 right-0 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleRemove(idx)}
+                      onClick={() => handleRemove(c.id!)}
                       className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
                     >
                       ×
                     </button>
                     <button
-                      onClick={() => setEditingIndex(idx)}
+                      onClick={() => handleEdit(c.id!)}
                       className="bg-teal-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
                     >
                       <FaEdit size={8} />
@@ -176,20 +175,6 @@ export default function CompetenceSection() {
                   setNewCompetence({ ...newCompetence, name: e.target.value })
                 }
               />
-              <select
-                value={newCompetence.level}
-                className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                onChange={(e) =>
-                  setNewCompetence({
-                    ...newCompetence,
-                    level: parseInt(e.target.value),
-                  })
-                }
-              >
-                <option value={0}>Beginner</option>
-                <option value={1}>Intermediate</option>
-                <option value={2}>Expert</option>
-              </select>
               <div className="flex space-x-2">
                 <button
                   onClick={handleAdd}

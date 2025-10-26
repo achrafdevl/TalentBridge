@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional, Dict
 from .common import MongoBaseModel
 
@@ -16,6 +16,15 @@ class UserCreate(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "email": "user@example.com",
+                "password": "yourpassword"
+            }
+        }
+    )
 
 class UserResponse(MongoBaseModel, UserBase):
     pass

@@ -1,44 +1,60 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
-import type { Language } from "@/app/types/language-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchLanguages,
+  createLanguage,
+  updateLanguage,
+  deleteLanguage,
+  Language,
+} from "@/redux/slices/cvProfileSlice";
 
 export default function LanguageSection() {
-  const [languages, setLanguages] = useState<Language[]>([
-    { name: "Arabic", level: "Native" },
-    { name: "English", level: "Fluent" },
-    { name: "Spanish", level: "Basic" },
-  ]);
+  const dispatch = useAppDispatch();
+  const { languages } = useAppSelector((state) => state.cvProfile);
 
-  const emptyLanguage: Language = {
+  const emptyLanguage: Omit<Language, "id"> = {
     name: "",
     level: "",
   };
 
-  const [newLanguage, setNewLanguage] = useState<Language>({
+  const [newLanguage, setNewLanguage] = useState<Omit<Language, "id">>({
     ...emptyLanguage,
   });
+  const [editingData, setEditingData] = useState<Language | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchLanguages());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newLanguage.name || !newLanguage.level) return;
-    setLanguages([...languages, newLanguage]);
+    await dispatch(createLanguage(newLanguage));
     setNewLanguage({ ...emptyLanguage });
     setIsAdding(false);
   };
 
-  const handleRemove = (index: number) => {
-    setLanguages(languages.filter((_, i) => i !== index));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteLanguage(id));
   };
 
-  const handleSaveEdit = (index: number, updated: Language) => {
-    setLanguages(languages.map((lang, i) => (i === index ? updated : lang)));
+  const handleSaveEdit = async (id: string, updated: Omit<Language, "id">) => {
+    await dispatch(updateLanguage({ id, data: updated }));
     setEditingIndex(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string, idx: number) => {
+    setEditingIndex(idx);
+    const lang = languages[idx];
+    if (lang) setEditingData({ ...lang });
   };
 
   return (
@@ -52,30 +68,25 @@ export default function LanguageSection() {
       {isExpanded && (
         <div className="p-4 space-y-2">
           {languages.map((lang, idx) =>
-            editingIndex === idx ? (
-              <div key={idx} className="border rounded p-3 space-y-2">
+            editingIndex === idx && editingData ? (
+              <div
+                key={lang.id || idx}
+                className="border rounded p-3 space-y-2"
+              >
                 <input
                   type="text"
                   placeholder="Language"
                   className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                  value={lang.name}
+                  value={editingData.name}
                   onChange={(e) =>
-                    setLanguages((prev) =>
-                      prev.map((item, i) =>
-                        i === idx ? { ...item, name: e.target.value } : item
-                      )
-                    )
+                    setEditingData({ ...editingData, name: e.target.value })
                   }
                 />
                 <select
                   className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                  value={lang.level}
+                  value={editingData.level}
                   onChange={(e) =>
-                    setLanguages((prev) =>
-                      prev.map((item, i) =>
-                        i === idx ? { ...item, level: e.target.value } : item
-                      )
-                    )
+                    setEditingData({ ...editingData, level: e.target.value })
                   }
                 >
                   <option value="">Select Level</option>
@@ -87,13 +98,21 @@ export default function LanguageSection() {
                 </select>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleSaveEdit(idx, lang)}
+                    onClick={() => {
+                      if (editingData.id) {
+                        const { id, ...data } = editingData;
+                        handleSaveEdit(id, data);
+                      }
+                    }}
                     className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingIndex(null)}
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setEditingData(null);
+                    }}
                     className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
                   >
                     Cancel
@@ -102,7 +121,7 @@ export default function LanguageSection() {
               </div>
             ) : (
               <div
-                key={idx}
+                key={lang.id || idx}
                 className="flex justify-between items-center border-b pb-2 last:border-none relative group"
               >
                 <span className="font-medium text-sm text-gray-800">
@@ -112,13 +131,13 @@ export default function LanguageSection() {
                   <span className="text-xs text-gray-500">{lang.level}</span>
                   <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleRemove(idx)}
+                      onClick={() => lang.id && handleRemove(lang.id)}
                       className="p-1 text-red-500 hover:bg-red-50 rounded"
                     >
                       <FaTrash size={10} />
                     </button>
                     <button
-                      onClick={() => setEditingIndex(idx)}
+                      onClick={() => handleEdit(lang.id!, idx)}
                       className="p-1 text-teal-500 hover:bg-teal-50 rounded"
                     >
                       <FaEdit size={10} />

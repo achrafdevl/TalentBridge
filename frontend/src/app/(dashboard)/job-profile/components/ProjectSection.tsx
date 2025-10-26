@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaPlus,
   FaTrash,
@@ -13,23 +13,19 @@ import {
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
 import type { Project } from "@/app/types/project-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "@/redux/slices/cvProfileSlice";
 
 export default function ProjectSection() {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: "1",
-      title: "E-commerce Platform",
-      description: "Full-stack e-commerce solution with payment integration",
-      technologies: ["React", "Node.js", "MongoDB", "Stripe"],
-      githubLink: "https://github.com/username/ecommerce",
-      liveDemo: "https://demo.example.com",
-      tags: ["Web App", "Full Stack"],
-      date: "2023-12",
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { projects } = useAppSelector((state) => state.cvProfile);
 
-  const emptyProject: Project = {
-    id: "",
+  const emptyProject: Omit<Project, "id"> = {
     title: "",
     description: "",
     technologies: [],
@@ -39,39 +35,50 @@ export default function ProjectSection() {
     date: "",
   };
 
-  const [newProject, setNewProject] = useState<Project>({ ...emptyProject });
+  const [newProject, setNewProject] = useState<Omit<Project, "id">>({
+    ...emptyProject,
+  });
+  const [editingData, setEditingData] = useState<Project | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [techInput, setTechInput] = useState("");
   const [tagInput, setTagInput] = useState("");
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchProjects());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newProject.title || !newProject.description) return;
-    setProjects([...projects, { ...newProject, id: Date.now().toString() }]);
+    await dispatch(createProject(newProject));
     setNewProject({ ...emptyProject });
     setIsAdding(false);
   };
 
-  const handleRemove = (id: string) => {
-    setProjects(projects.filter((proj) => proj.id !== id));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteProject(id));
   };
 
-  const handleSaveEdit = (id: string, updated: Project) => {
-    setProjects(projects.map((proj) => (proj.id === id ? { ...updated, id } : proj)));
+  const handleSaveEdit = async (id: string, updated: Omit<Project, "id">) => {
+    await dispatch(updateProject({ id, data: updated }));
     setEditingId(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    const proj = projects.find((p) => p.id === id);
+    if (proj) setEditingData({ ...proj });
   };
 
   const handleAddTech = (projectId?: string) => {
     if (!techInput.trim()) return;
-    if (projectId) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.id === projectId
-            ? { ...proj, technologies: [...proj.technologies, techInput.trim()] }
-            : proj
-        )
-      );
+    if (projectId && editingData) {
+      setEditingData({
+        ...editingData,
+        technologies: [...(editingData.technologies || []), techInput.trim()],
+      });
     } else {
       setNewProject({
         ...newProject,
@@ -82,17 +89,11 @@ export default function ProjectSection() {
   };
 
   const handleRemoveTech = (tech: string, projectId?: string) => {
-    if (projectId) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.id === projectId
-            ? {
-                ...proj,
-                technologies: proj.technologies.filter((t) => t !== tech),
-              }
-            : proj
-        )
-      );
+    if (projectId && editingData) {
+      setEditingData({
+        ...editingData,
+        technologies: editingData.technologies?.filter((t) => t !== tech) || [],
+      });
     } else {
       setNewProject({
         ...newProject,
@@ -103,14 +104,11 @@ export default function ProjectSection() {
 
   const handleAddTag = (projectId?: string) => {
     if (!tagInput.trim()) return;
-    if (projectId) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.id === projectId
-            ? { ...proj, tags: [...(proj.tags || []), tagInput.trim()] }
-            : proj
-        )
-      );
+    if (projectId && editingData) {
+      setEditingData({
+        ...editingData,
+        tags: [...(editingData.tags || []), tagInput.trim()],
+      });
     } else {
       setNewProject({
         ...newProject,
@@ -121,14 +119,11 @@ export default function ProjectSection() {
   };
 
   const handleRemoveTag = (tag: string, projectId?: string) => {
-    if (projectId) {
-      setProjects((prev) =>
-        prev.map((proj) =>
-          proj.id === projectId
-            ? { ...proj, tags: proj.tags?.filter((t) => t !== tag) }
-            : proj
-        )
-      );
+    if (projectId && editingData) {
+      setEditingData({
+        ...editingData,
+        tags: editingData.tags?.filter((t) => t !== tag),
+      });
     } else {
       setNewProject({
         ...newProject,
@@ -148,37 +143,28 @@ export default function ProjectSection() {
       {isExpanded && (
         <div className="p-6 space-y-6">
           {projects.map((project) =>
-            editingId === project.id ? (
-              <div key={project.id} className="border-b pb-4 last:border-none space-y-4">
+            editingId === project.id && editingData ? (
+              <div
+                key={project.id}
+                className="border-b pb-4 last:border-none space-y-4"
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
                     type="text"
                     placeholder="Project Title"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={project.title}
+                    value={editingData.title}
                     onChange={(e) =>
-                      setProjects((prev) =>
-                        prev.map((item) =>
-                          item.id === project.id
-                            ? { ...item, title: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({ ...editingData, title: e.target.value })
                     }
                   />
                   <input
                     type="date"
                     placeholder="Date"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={project.date}
+                    value={editingData.date}
                     onChange={(e) =>
-                      setProjects((prev) =>
-                        prev.map((item) =>
-                          item.id === project.id
-                            ? { ...item, date: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({ ...editingData, date: e.target.value })
                     }
                   />
                 </div>
@@ -186,15 +172,12 @@ export default function ProjectSection() {
                   placeholder="Description"
                   className="input w-full px-4 py-2 border rounded-lg text-gray-800"
                   rows={3}
-                  value={project.description}
+                  value={editingData.description}
                   onChange={(e) =>
-                    setProjects((prev) =>
-                      prev.map((item) =>
-                        item.id === project.id
-                          ? { ...item, description: e.target.value }
-                          : item
-                      )
-                    )
+                    setEditingData({
+                      ...editingData,
+                      description: e.target.value,
+                    })
                   }
                 />
 
@@ -213,26 +196,26 @@ export default function ProjectSection() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handleAddTech(project.id);
+                          handleAddTech(editingData.id);
                         }
                       }}
                     />
                     <button
-                      onClick={() => handleAddTech(project.id)}
+                      onClick={() => handleAddTech(editingData.id)}
                       className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
                     >
                       <FaPlus />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {project.technologies.map((tech, idx) => (
+                    {editingData.technologies?.map((tech, idx) => (
                       <span
                         key={idx}
                         className="px-2 py-1 bg-indigo-100 text-indigo-600 rounded text-xs flex items-center space-x-1"
                       >
                         <span>{tech}</span>
                         <button
-                          onClick={() => handleRemoveTech(tech, project.id)}
+                          onClick={() => handleRemoveTech(tech, editingData.id)}
                           className="text-indigo-400 hover:text-indigo-600"
                         >
                           ×
@@ -257,26 +240,26 @@ export default function ProjectSection() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
-                          handleAddTag(project.id);
+                          handleAddTag(editingData.id);
                         }
                       }}
                     />
                     <button
-                      onClick={() => handleAddTag(project.id)}
+                      onClick={() => handleAddTag(editingData.id)}
                       className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
                     >
                       <FaPlus />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {project.tags?.map((tag, idx) => (
+                    {editingData.tags?.map((tag, idx) => (
                       <span
                         key={idx}
                         className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs flex items-center space-x-1"
                       >
                         <span>#{tag}</span>
                         <button
-                          onClick={() => handleRemoveTag(tag, project.id)}
+                          onClick={() => handleRemoveTag(tag, editingData.id)}
                           className="text-gray-400 hover:text-gray-600"
                         >
                           ×
@@ -291,43 +274,42 @@ export default function ProjectSection() {
                     type="url"
                     placeholder="GitHub Link (Optional)"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={project.githubLink}
+                    value={editingData.githubLink}
                     onChange={(e) =>
-                      setProjects((prev) =>
-                        prev.map((item) =>
-                          item.id === project.id
-                            ? { ...item, githubLink: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        githubLink: e.target.value,
+                      })
                     }
                   />
                   <input
                     type="url"
                     placeholder="Live Demo Link (Optional)"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={project.liveDemo}
+                    value={editingData.liveDemo}
                     onChange={(e) =>
-                      setProjects((prev) =>
-                        prev.map((item) =>
-                          item.id === project.id
-                            ? { ...item, liveDemo: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        liveDemo: e.target.value,
+                      })
                     }
                   />
                 </div>
-
                 <div className="flex space-x-3">
                   <button
-                    onClick={() => handleSaveEdit(project.id, project)}
+                    onClick={() => {
+                      const { id, ...data } = editingData;
+                      handleSaveEdit(id, data);
+                    }}
                     className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingId(null)}
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditingData(null);
+                    }}
                     className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
                     Cancel
@@ -335,7 +317,10 @@ export default function ProjectSection() {
                 </div>
               </div>
             ) : (
-              <div key={project.id} className="border-b pb-4 last:border-none relative group">
+              <div
+                key={project.id}
+                className="border-b pb-4 last:border-none relative group"
+              >
                 <div className="absolute top-0 right-0 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleRemove(project.id)}
@@ -344,14 +329,16 @@ export default function ProjectSection() {
                     <FaTrash />
                   </button>
                   <button
-                    onClick={() => setEditingId(project.id)}
+                    onClick={() => handleEdit(project.id)}
                     className="p-2 text-teal-500 hover:bg-teal-50 rounded"
                   >
                     <FaEdit />
                   </button>
                 </div>
                 <div className="flex flex-col md:flex-row md:justify-between mb-2">
-                  <h4 className="text-lg font-semibold text-gray-800">{project.title}</h4>
+                  <h4 className="text-lg font-semibold text-gray-800">
+                    {project.title}
+                  </h4>
                   {project.date && (
                     <div className="text-sm text-gray-500 flex items-center space-x-2">
                       <FaCalendarAlt className="text-teal-500" />
@@ -359,9 +346,11 @@ export default function ProjectSection() {
                     </div>
                   )}
                 </div>
-                <p className="text-gray-600 text-sm mb-3">{project.description}</p>
+                <p className="text-gray-600 text-sm mb-3">
+                  {project.description}
+                </p>
 
-                {project.technologies.length > 0 && (
+                {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {project.technologies.map((tech, idx) => (
                       <span
@@ -423,14 +412,18 @@ export default function ProjectSection() {
                   placeholder="Project Title"
                   className="text-gray-800 input px-4 py-2 border rounded-lg"
                   value={newProject.title}
-                  onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                  onChange={(e) =>
+                    setNewProject({ ...newProject, title: e.target.value })
+                  }
                 />
                 <input
                   type="date"
                   placeholder="Date"
                   className="text-gray-800 input px-4 py-2 border rounded-lg"
                   value={newProject.date}
-                  onChange={(e) => setNewProject({ ...newProject, date: e.target.value })}
+                  onChange={(e) =>
+                    setNewProject({ ...newProject, date: e.target.value })
+                  }
                 />
               </div>
               <textarea
@@ -438,7 +431,9 @@ export default function ProjectSection() {
                 className="input w-full px-4 py-2 border rounded-lg text-gray-800"
                 rows={3}
                 value={newProject.description}
-                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                onChange={(e) =>
+                  setNewProject({ ...newProject, description: e.target.value })
+                }
               />
 
               {/* Technologies */}
@@ -487,7 +482,9 @@ export default function ProjectSection() {
 
               {/* Tags */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Tags</label>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Tags
+                </label>
                 <div className="flex space-x-2">
                   <input
                     type="text"
@@ -533,14 +530,18 @@ export default function ProjectSection() {
                   placeholder="GitHub Link (Optional)"
                   className="text-gray-800 input px-4 py-2 border rounded-lg"
                   value={newProject.githubLink}
-                  onChange={(e) => setNewProject({ ...newProject, githubLink: e.target.value })}
+                  onChange={(e) =>
+                    setNewProject({ ...newProject, githubLink: e.target.value })
+                  }
                 />
                 <input
                   type="url"
                   placeholder="Live Demo Link (Optional)"
                   className="text-gray-800 input px-4 py-2 border rounded-lg"
                   value={newProject.liveDemo}
-                  onChange={(e) => setNewProject({ ...newProject, liveDemo: e.target.value })}
+                  onChange={(e) =>
+                    setNewProject({ ...newProject, liveDemo: e.target.value })
+                  }
                 />
               </div>
 

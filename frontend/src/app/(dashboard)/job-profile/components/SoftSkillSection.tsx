@@ -1,47 +1,70 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaEdit } from "react-icons/fa";
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
-import type { Competence } from "@/app/types/competence-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchCompetences,
+  createCompetence,
+  updateCompetence,
+  deleteCompetence,
+  Competence,
+} from "@/redux/slices/cvProfileSlice";
+
+interface SoftSkill {
+  id?: string;
+  name: string;
+  level: number;
+}
 
 export default function SoftSkillSection() {
-  const [softSkills, setSoftSkills] = useState<Competence[]>([
-    { name: "Communication", level: 2 },
-    { name: "Teamwork", level: 1 },
-    { name: "Leadership", level: 1 },
-    { name: "Problem Solving", level: 2 },
-  ]);
+  const dispatch = useAppDispatch();
+  const { competences } = useAppSelector((state) => state.cvProfile);
 
-  const emptySoftSkill: Competence = {
+  const softSkills = competences.filter(
+    (c) => c.name !== undefined
+  ) as (Competence & { level?: number })[];
+
+  const emptySoftSkill: SoftSkill = {
     name: "",
     level: 0,
   };
 
-  const [newSoftSkill, setNewSoftSkill] = useState<Competence>({
+  const [newSoftSkill, setNewSoftSkill] = useState<SoftSkill>({
     ...emptySoftSkill,
   });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [editingData, setEditingData] = useState<SoftSkill | null>(null);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchCompetences());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newSoftSkill.name) return;
-    setSoftSkills([...softSkills, newSoftSkill]);
+    await dispatch(createCompetence({ name: newSoftSkill.name }));
     setNewSoftSkill({ ...emptySoftSkill });
     setIsAdding(false);
   };
 
-  const handleRemove = (index: number) => {
-    setSoftSkills(softSkills.filter((_, i) => i !== index));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteCompetence(id));
   };
 
-  const handleSaveEdit = (index: number, updated: Competence) => {
-    setSoftSkills(
-      softSkills.map((skill, i) => (i === index ? updated : skill))
-    );
+  const handleSaveEdit = async (id: string, updated: { name: string }) => {
+    await dispatch(updateCompetence({ id, data: updated }));
     setEditingIndex(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string, idx: number) => {
+    setEditingIndex(idx);
+    const skill = softSkills[idx];
+    if (skill) setEditingData({ ...skill, level: 0 });
   };
 
   const getLevelColor = (level: number) => {
@@ -81,47 +104,36 @@ export default function SoftSkillSection() {
       {isExpanded && (
         <div className="p-4 space-y-2">
           {softSkills.map((skill, idx) =>
-            editingIndex === idx ? (
-              <div key={idx} className="border rounded p-3 space-y-2">
+            editingIndex === idx && editingData ? (
+              <div
+                key={skill.id || idx}
+                className="border rounded p-3 space-y-2"
+              >
                 <input
                   type="text"
                   placeholder="Soft Skill Name"
                   className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                  value={skill.name}
+                  value={editingData.name}
                   onChange={(e) =>
-                    setSoftSkills((prev) =>
-                      prev.map((item, i) =>
-                        i === idx ? { ...item, name: e.target.value } : item
-                      )
-                    )
+                    setEditingData({ ...editingData, name: e.target.value })
                   }
                 />
-                <select
-                  value={skill.level}
-                  className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                  onChange={(e) =>
-                    setSoftSkills((prev) =>
-                      prev.map((item, i) =>
-                        i === idx
-                          ? { ...item, level: parseInt(e.target.value) }
-                          : item
-                      )
-                    )
-                  }
-                >
-                  <option value={0}>Beginner</option>
-                  <option value={1}>Intermediate</option>
-                  <option value={2}>Expert</option>
-                </select>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleSaveEdit(idx, skill)}
+                    onClick={() => {
+                      if (skill.id) {
+                        handleSaveEdit(skill.id, { name: editingData.name });
+                      }
+                    }}
                     className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingIndex(null)}
+                    onClick={() => {
+                      setEditingIndex(null);
+                      setEditingData(null);
+                    }}
                     className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
                   >
                     Cancel
@@ -130,26 +142,26 @@ export default function SoftSkillSection() {
               </div>
             ) : (
               <div
-                key={idx}
+                key={skill.id || idx}
                 className={`px-2 py-1 rounded text-xs border relative group ${getLevelColor(
-                  skill.level
+                  skill.level || 0
                 )}`}
               >
                 <div className="flex justify-between items-center">
                   <span>{skill.name}</span>
                   <span className="text-[10px] opacity-70">
-                    {getLevelLabel(skill.level)}
+                    {getLevelLabel(skill.level || 0)}
                   </span>
                 </div>
                 <div className="absolute top-0 right-0 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    onClick={() => handleRemove(idx)}
+                    onClick={() => handleRemove(skill.id!)}
                     className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
                   >
                     ×
                   </button>
                   <button
-                    onClick={() => setEditingIndex(idx)}
+                    onClick={() => handleEdit(skill.id!, idx)}
                     className="bg-teal-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
                   >
                     <FaEdit size={8} />
@@ -170,20 +182,6 @@ export default function SoftSkillSection() {
                   setNewSoftSkill({ ...newSoftSkill, name: e.target.value })
                 }
               />
-              <select
-                value={newSoftSkill.level}
-                className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
-                onChange={(e) =>
-                  setNewSoftSkill({
-                    ...newSoftSkill,
-                    level: parseInt(e.target.value),
-                  })
-                }
-              >
-                <option value={0}>Beginner</option>
-                <option value={1}>Intermediate</option>
-                <option value={2}>Expert</option>
-              </select>
               <div className="flex space-x-2">
                 <button
                   onClick={handleAdd}

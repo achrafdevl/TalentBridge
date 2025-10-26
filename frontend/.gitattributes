@@ -1,10 +1,12 @@
 # Force LF for all text files
-* text=auto
 * text=auto eol=lf
-*.ts text
-*.tsx text
-*.js text
-*.jsx text
-*.css text
-*.json text
-*.md text
+
+# Explicit formats (optional but good practice)
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.css  text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.py   text eol=lf

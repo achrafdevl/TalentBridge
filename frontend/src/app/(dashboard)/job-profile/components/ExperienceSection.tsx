@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaBuilding,
   FaPlus,
@@ -12,24 +12,19 @@ import {
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
 import type { Experience } from "@/app/types/experience-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchExperiences,
+  createExperience,
+  updateExperience,
+  deleteExperience,
+} from "@/redux/slices/cvProfileSlice";
 
 export default function ExperienceSection() {
-  const [experiences, setExperiences] = useState<Experience[]>([
-    {
-      id: "1",
-      company: "Eco Habitat Lux Inc.",
-      position: "Creative Art Director",
-      location: "Casablanca, Morocco",
-      startDate: "Jan 2022",
-      endDate: "Present",
-      responsibilities:
-        "Successfully increased annual revenue to 1M MAD through design strategy and cross-team collaboration.",
-      technologies: ["Figma", "Adobe XD", "React"],
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { experiences } = useAppSelector((state) => state.cvProfile);
 
-  const emptyExperience: Experience = {
-    id: "",
+  const emptyExperience: Omit<Experience, "id"> = {
     company: "",
     position: "",
     location: "",
@@ -39,32 +34,42 @@ export default function ExperienceSection() {
     technologies: [],
   };
 
-  const [newExperience, setNewExperience] = useState<Experience>({
+  const [newExperience, setNewExperience] = useState<Omit<Experience, "id">>({
     ...emptyExperience,
   });
+  const [editingData, setEditingData] = useState<Experience | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchExperiences());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newExperience.company || !newExperience.position) return;
-    setExperiences([
-      ...experiences,
-      { ...newExperience, id: Date.now().toString() },
-    ]);
+    await dispatch(createExperience(newExperience));
     setNewExperience({ ...emptyExperience });
     setIsAdding(false);
   };
 
-  const handleRemove = (id: string) => {
-    setExperiences(experiences.filter((exp) => exp.id !== id));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteExperience(id));
   };
 
-  const handleSaveEdit = (id: string, updated: Experience) => {
-    setExperiences(
-      experiences.map((exp) => (exp.id === id ? { ...updated, id } : exp))
-    );
+  const handleSaveEdit = async (
+    id: string,
+    updated: Omit<Experience, "id">
+  ) => {
+    await dispatch(updateExperience({ id, data: updated }));
     setEditingId(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    const exp = experiences.find((e) => e.id === id);
+    if (exp) setEditingData({ ...exp, technologies: exp.technologies || [] });
   };
 
   return (
@@ -78,7 +83,7 @@ export default function ExperienceSection() {
       {isExpanded && (
         <div className="p-6 space-y-6">
           {experiences.map((exp) =>
-            editingId === exp.id ? (
+            editingId === exp.id && editingData ? (
               <div
                 key={exp.id}
                 className="border-b pb-4 last:border-none space-y-4"
@@ -87,75 +92,60 @@ export default function ExperienceSection() {
                   <input
                     type="text"
                     placeholder="Position"
-                    value={exp.position}
+                    value={editingData.position}
                     onChange={(e) =>
-                      setExperiences((prev) =>
-                        prev.map((item) =>
-                          item.id === exp.id
-                            ? { ...item, position: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        position: e.target.value,
+                      })
                     }
                     className="input px-4 py-2 border rounded-lg text-gray-800"
                   />
                   <input
                     type="text"
                     placeholder="Company"
-                    value={exp.company}
+                    value={editingData.company}
                     onChange={(e) =>
-                      setExperiences((prev) =>
-                        prev.map((item) =>
-                          item.id === exp.id
-                            ? { ...item, company: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        company: e.target.value,
+                      })
                     }
                     className="input px-4 py-2 border rounded-lg text-gray-800"
                   />
                   <input
                     type="text"
                     placeholder="Location"
-                    value={exp.location}
+                    value={editingData.location}
                     onChange={(e) =>
-                      setExperiences((prev) =>
-                        prev.map((item) =>
-                          item.id === exp.id
-                            ? { ...item, location: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        location: e.target.value,
+                      })
                     }
                     className="input px-4 py-2 border rounded-lg text-gray-800"
                   />
                   <input
                     type="text"
                     placeholder="Start Date"
-                    value={exp.startDate}
+                    value={editingData.startDate}
                     onChange={(e) =>
-                      setExperiences((prev) =>
-                        prev.map((item) =>
-                          item.id === exp.id
-                            ? { ...item, startDate: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        startDate: e.target.value,
+                      })
                     }
                     className="input px-4 py-2 border rounded-lg text-gray-800"
                   />
                   <input
                     type="text"
                     placeholder="End Date"
-                    value={exp.endDate}
+                    value={editingData.endDate}
                     onChange={(e) =>
-                      setExperiences((prev) =>
-                        prev.map((item) =>
-                          item.id === exp.id
-                            ? { ...item, endDate: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        endDate: e.target.value,
+                      })
                     }
                     className="input px-4 py-2 border rounded-lg text-gray-800"
                   />
@@ -163,20 +153,17 @@ export default function ExperienceSection() {
                 <textarea
                   placeholder="Responsibilities"
                   rows={3}
-                  value={exp.responsibilities}
+                  value={editingData.responsibilities}
                   onChange={(e) =>
-                    setExperiences((prev) =>
-                      prev.map((item) =>
-                        item.id === exp.id
-                          ? { ...item, responsibilities: e.target.value }
-                          : item
-                      )
-                    )
+                    setEditingData({
+                      ...editingData,
+                      responsibilities: e.target.value,
+                    })
                   }
                   className="input w-full px-4 py-2 border rounded-lg text-gray-800"
                 />
                 <div className="flex flex-wrap gap-2">
-                  {exp.technologies.map((tech, idx) => (
+                  {editingData.technologies?.map((tech, idx) => (
                     <div
                       key={idx}
                       className="flex items-center space-x-1 bg-blue-100 text-blue-700 rounded px-2 py-1 text-xs"
@@ -185,18 +172,13 @@ export default function ExperienceSection() {
                       <button
                         type="button"
                         onClick={() =>
-                          setExperiences((prev) =>
-                            prev.map((item) =>
-                              item.id === exp.id
-                                ? {
-                                    ...item,
-                                    technologies: item.technologies.filter(
-                                      (_, i) => i !== idx
-                                    ),
-                                  }
-                                : item
-                            )
-                          )
+                          setEditingData({
+                            ...editingData,
+                            technologies:
+                              editingData.technologies?.filter(
+                                (_, i) => i !== idx
+                              ) || [],
+                          })
                         }
                       >
                         ✖
@@ -209,16 +191,13 @@ export default function ExperienceSection() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && e.currentTarget.value.trim()) {
                         const newTech = e.currentTarget.value.trim();
-                        setExperiences((prev) =>
-                          prev.map((item) =>
-                            item.id === exp.id
-                              ? {
-                                  ...item,
-                                  technologies: [...item.technologies, newTech],
-                                }
-                              : item
-                          )
-                        );
+                        setEditingData({
+                          ...editingData,
+                          technologies: [
+                            ...(editingData.technologies || []),
+                            newTech,
+                          ],
+                        });
                         e.currentTarget.value = "";
                       }
                     }}
@@ -227,13 +206,19 @@ export default function ExperienceSection() {
                 </div>
                 <div className="flex space-x-3 mt-2">
                   <button
-                    onClick={() => handleSaveEdit(exp.id, exp)}
+                    onClick={() => {
+                      const { id, ...data } = editingData;
+                      handleSaveEdit(id, data);
+                    }}
                     className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingId(null)}
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditingData(null);
+                    }}
                     className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
                     Cancel
@@ -253,7 +238,7 @@ export default function ExperienceSection() {
                     <FaTrash />
                   </button>
                   <button
-                    onClick={() => setEditingId(exp.id)}
+                    onClick={() => handleEdit(exp.id)}
                     className="p-2 text-teal-500 hover:bg-teal-50 rounded"
                   >
                     <FaEdit />
@@ -278,7 +263,7 @@ export default function ExperienceSection() {
                 <p className="text-gray-600 text-sm mt-2">
                   {exp.responsibilities}
                 </p>
-                {exp.technologies.length > 0 && (
+                {exp.technologies && exp.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {exp.technologies.map((tech, idx) => (
                       <span
@@ -303,7 +288,10 @@ export default function ExperienceSection() {
                   className="input px-4 py-2 border rounded-lg text-gray-800"
                   value={newExperience.position}
                   onChange={(e) =>
-                    setNewExperience({ ...newExperience, position: e.target.value })
+                    setNewExperience({
+                      ...newExperience,
+                      position: e.target.value,
+                    })
                   }
                 />
                 <input
@@ -312,7 +300,10 @@ export default function ExperienceSection() {
                   className="input px-4 py-2 border rounded-lg text-gray-800"
                   value={newExperience.company}
                   onChange={(e) =>
-                    setNewExperience({ ...newExperience, company: e.target.value })
+                    setNewExperience({
+                      ...newExperience,
+                      company: e.target.value,
+                    })
                   }
                 />
                 <input
@@ -321,7 +312,10 @@ export default function ExperienceSection() {
                   className="input px-4 py-2 border rounded-lg text-gray-800"
                   value={newExperience.location}
                   onChange={(e) =>
-                    setNewExperience({ ...newExperience, location: e.target.value })
+                    setNewExperience({
+                      ...newExperience,
+                      location: e.target.value,
+                    })
                   }
                 />
                 <input
@@ -342,7 +336,10 @@ export default function ExperienceSection() {
                   className="input px-4 py-2 border rounded-lg text-gray-800"
                   value={newExperience.endDate}
                   onChange={(e) =>
-                    setNewExperience({ ...newExperience, endDate: e.target.value })
+                    setNewExperience({
+                      ...newExperience,
+                      endDate: e.target.value,
+                    })
                   }
                 />
               </div>

@@ -1,25 +1,23 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
 import type { Education } from "@/app/types/education-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchEducation,
+  createEducation,
+  updateEducation,
+  deleteEducation,
+} from "@/redux/slices/cvProfileSlice";
 
 export default function EducationSection() {
-  const [education, setEducation] = useState<Education[]>([
-    {
-      id: "1",
-      school: "University Hassan II",
-      certificate: "Master of Multimedia Design & Development",
-      startDate: "2018",
-      endDate: "2020",
-      location: "Casablanca, Morocco",
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { education } = useAppSelector((state) => state.cvProfile);
 
-  const emptyEducation: Education = {
-    id: "",
+  const emptyEducation: Omit<Education, "id"> = {
     school: "",
     certificate: "",
     startDate: "",
@@ -27,32 +25,39 @@ export default function EducationSection() {
     location: "",
   };
 
-  const [newEducation, setNewEducation] = useState<Education>({
+  const [newEducation, setNewEducation] = useState<Omit<Education, "id">>({
     ...emptyEducation,
   });
+  const [editingData, setEditingData] = useState<Education | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchEducation());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newEducation.school || !newEducation.certificate) return;
-    setEducation([
-      ...education,
-      { ...newEducation, id: Date.now().toString() },
-    ]);
+    await dispatch(createEducation(newEducation));
     setNewEducation({ ...emptyEducation });
     setIsAdding(false);
   };
 
-  const handleRemove = (id: string) => {
-    setEducation(education.filter((edu) => edu.id !== id));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteEducation(id));
   };
 
-  const handleSaveEdit = (id: string, updated: Education) => {
-    setEducation(
-      education.map((edu) => (edu.id === id ? { ...updated, id } : edu))
-    );
+  const handleSaveEdit = async (id: string, updated: Omit<Education, "id">) => {
+    await dispatch(updateEducation({ id, data: updated }));
     setEditingId(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    const edu = education.find((e) => e.id === id);
+    if (edu) setEditingData({ ...edu });
   };
 
   return (
@@ -66,51 +71,36 @@ export default function EducationSection() {
       {isExpanded && (
         <div className="p-4 space-y-4">
           {education.map((edu) =>
-            editingId === edu.id ? (
+            editingId === edu.id && editingData ? (
               <div key={edu.id} className="space-y-2">
                 <input
                   type="text"
                   placeholder="School"
                   className="input w-full px-3 py-2 border rounded-lg text-sm"
-                  value={edu.school}
+                  value={editingData.school}
                   onChange={(e) =>
-                    setEducation((prev) =>
-                      prev.map((item) =>
-                        item.id === edu.id
-                          ? { ...item, school: e.target.value }
-                          : item
-                      )
-                    )
+                    setEditingData({ ...editingData, school: e.target.value })
                   }
                 />
                 <input
                   type="text"
                   placeholder="Certificate"
                   className="input w-full px-3 py-2 border rounded-lg text-sm"
-                  value={edu.certificate}
+                  value={editingData.certificate}
                   onChange={(e) =>
-                    setEducation((prev) =>
-                      prev.map((item) =>
-                        item.id === edu.id
-                          ? { ...item, certificate: e.target.value }
-                          : item
-                      )
-                    )
+                    setEditingData({
+                      ...editingData,
+                      certificate: e.target.value,
+                    })
                   }
                 />
                 <input
                   type="text"
                   placeholder="Location"
                   className="input w-full px-3 py-2 border rounded-lg text-sm"
-                  value={edu.location}
+                  value={editingData.location || ""}
                   onChange={(e) =>
-                    setEducation((prev) =>
-                      prev.map((item) =>
-                        item.id === edu.id
-                          ? { ...item, location: e.target.value }
-                          : item
-                      )
-                    )
+                    setEditingData({ ...editingData, location: e.target.value })
                   }
                 />
                 <div className="grid grid-cols-2 gap-2">
@@ -118,42 +108,42 @@ export default function EducationSection() {
                     type="text"
                     placeholder="Start Year"
                     className="input px-3 py-2 border rounded-lg text-sm"
-                    value={edu.startDate}
+                    value={editingData.startDate || ""}
                     onChange={(e) =>
-                      setEducation((prev) =>
-                        prev.map((item) =>
-                          item.id === edu.id
-                            ? { ...item, startDate: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        startDate: e.target.value,
+                      })
                     }
                   />
                   <input
                     type="text"
                     placeholder="End Year"
                     className="input px-3 py-2 border rounded-lg text-sm"
-                    value={edu.endDate}
+                    value={editingData.endDate || ""}
                     onChange={(e) =>
-                      setEducation((prev) =>
-                        prev.map((item) =>
-                          item.id === edu.id
-                            ? { ...item, endDate: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        endDate: e.target.value,
+                      })
                     }
                   />
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleSaveEdit(edu.id, edu)}
+                    onClick={() => {
+                      const { id, ...data } = editingData;
+                      handleSaveEdit(id, data);
+                    }}
                     className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingId(null)}
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditingData(null);
+                    }}
                     className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
                   >
                     Cancel
@@ -173,7 +163,7 @@ export default function EducationSection() {
                     <FaTrash size={12} />
                   </button>
                   <button
-                    onClick={() => setEditingId(edu.id)}
+                    onClick={() => handleEdit(edu.id)}
                     className="p-1 text-teal-500 hover:bg-teal-50 rounded"
                   >
                     <FaEdit size={12} />

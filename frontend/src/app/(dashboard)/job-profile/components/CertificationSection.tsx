@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaPlus,
   FaTrash,
@@ -12,22 +12,19 @@ import {
 import { Card } from "@/app/components/ui/Card";
 import SectionHeader from "@/app/(dashboard)/job-profile/components/SectionHeader";
 import type { Certification } from "@/app/types/certification-type";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  fetchCertifications,
+  createCertification,
+  updateCertification,
+  deleteCertification,
+} from "@/redux/slices/cvProfileSlice";
 
 export default function CertificationSection() {
-  const [certifications, setCertifications] = useState<Certification[]>([
-    {
-      id: "1",
-      title: "AWS Certified Solutions Architect",
-      issuer: "Amazon Web Services",
-      issueDate: "2023-06",
-      type: "certificat",
-      credentialId: "AWS-12345",
-      credentialUrl: "https://aws.amazon.com/certification",
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { certifications } = useAppSelector((state) => state.cvProfile);
 
-  const emptyCertification: Certification = {
-    id: "",
+  const emptyCertification: Omit<Certification, "id"> = {
     title: "",
     issuer: "",
     issueDate: "",
@@ -36,32 +33,44 @@ export default function CertificationSection() {
     credentialUrl: "",
   };
 
-  const [newCertification, setNewCertification] = useState<Certification>({
+  const [newCertification, setNewCertification] = useState<
+    Omit<Certification, "id">
+  >({
     ...emptyCertification,
   });
+  const [editingData, setEditingData] = useState<Certification | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAdd = () => {
+  useEffect(() => {
+    dispatch(fetchCertifications());
+  }, [dispatch]);
+
+  const handleAdd = async () => {
     if (!newCertification.title || !newCertification.issuer) return;
-    setCertifications([
-      ...certifications,
-      { ...newCertification, id: Date.now().toString() },
-    ]);
+    await dispatch(createCertification(newCertification));
     setNewCertification({ ...emptyCertification });
     setIsAdding(false);
   };
 
-  const handleRemove = (id: string) => {
-    setCertifications(certifications.filter((cert) => cert.id !== id));
+  const handleRemove = async (id: string) => {
+    await dispatch(deleteCertification(id));
   };
 
-  const handleSaveEdit = (id: string, updated: Certification) => {
-    setCertifications(
-      certifications.map((cert) => (cert.id === id ? { ...updated, id } : cert))
-    );
+  const handleSaveEdit = async (
+    id: string,
+    updated: Omit<Certification, "id">
+  ) => {
+    await dispatch(updateCertification({ id, data: updated }));
     setEditingId(null);
+    setEditingData(null);
+  };
+
+  const handleEdit = (id: string) => {
+    setEditingId(id);
+    const cert = certifications.find((c) => c.id === id);
+    if (cert) setEditingData({ ...cert });
   };
 
   return (
@@ -75,7 +84,7 @@ export default function CertificationSection() {
       {isExpanded && (
         <div className="p-6 space-y-6">
           {certifications.map((cert) =>
-            editingId === cert.id ? (
+            editingId === cert.id && editingData ? (
               <div
                 key={cert.id}
                 className="border-b pb-4 last:border-none space-y-4"
@@ -85,63 +94,40 @@ export default function CertificationSection() {
                     type="text"
                     placeholder="Title"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.title}
+                    value={editingData.title}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? { ...item, title: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({ ...editingData, title: e.target.value })
                     }
                   />
                   <input
                     type="text"
                     placeholder="Issuer"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.issuer}
+                    value={editingData.issuer}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? { ...item, issuer: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({ ...editingData, issuer: e.target.value })
                     }
                   />
                   <input
                     type="date"
                     placeholder="Issue Date"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.issueDate}
+                    value={editingData.issueDate}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? { ...item, issueDate: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        issueDate: e.target.value,
+                      })
                     }
                   />
                   <select
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.type}
+                    value={editingData.type}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? {
-                                ...item,
-                                type: e.target.value as
-                                  | "certificat"
-                                  | "diplôme",
-                              }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        type: e.target.value as "certificat" | "diplôme",
+                      })
                     }
                   >
                     <option value="certificat">Certificate</option>
@@ -151,42 +137,42 @@ export default function CertificationSection() {
                     type="text"
                     placeholder="Credential ID (Optional)"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.credentialId}
+                    value={editingData.credentialId || ""}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? { ...item, credentialId: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        credentialId: e.target.value,
+                      })
                     }
                   />
                   <input
                     type="url"
                     placeholder="Credential URL (Optional)"
                     className="text-gray-800 input px-4 py-2 border rounded-lg"
-                    value={cert.credentialUrl}
+                    value={editingData.credentialUrl || ""}
                     onChange={(e) =>
-                      setCertifications((prev) =>
-                        prev.map((item) =>
-                          item.id === cert.id
-                            ? { ...item, credentialUrl: e.target.value }
-                            : item
-                        )
-                      )
+                      setEditingData({
+                        ...editingData,
+                        credentialUrl: e.target.value,
+                      })
                     }
                   />
                 </div>
                 <div className="flex space-x-3">
                   <button
-                    onClick={() => handleSaveEdit(cert.id, cert)}
+                    onClick={() => {
+                      const { id, ...data } = editingData;
+                      handleSaveEdit(id, data);
+                    }}
                     className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
                   >
                     Save
                   </button>
                   <button
-                    onClick={() => setEditingId(null)}
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditingData(null);
+                    }}
                     className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                   >
                     Cancel
@@ -206,7 +192,7 @@ export default function CertificationSection() {
                     <FaTrash />
                   </button>
                   <button
-                    onClick={() => setEditingId(cert.id)}
+                    onClick={() => handleEdit(cert.id)}
                     className="p-2 text-teal-500 hover:bg-teal-50 rounded"
                   >
                     <FaEdit />

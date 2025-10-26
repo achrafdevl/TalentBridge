@@ -41,7 +41,7 @@ const menuItems = [
     badge: "3",
     subItems: [
       { title: "Générer un CV", path: "/cv-generate", icon: FaPlus },
-      { title: "Mes CV", path: "/cv-generate?tab=my-resumes", icon: FaEye },
+      { title: "Mes CV", path: "/mes-CV", icon: FaEye },
     ],
   },
   {
@@ -217,12 +217,14 @@ export default function Sidebar() {
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
               {user?.profile_image ? (
                 <Image
-                  src={user.profile_image}
-                  alt={user.full_name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                />
+                src="/Logo.png"   // or /default-avatar.png if you add one later
+                alt={user.full_name}
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+              
+              
               ) : (
                 <FaUser className="w-4 h-4" />
               )}
