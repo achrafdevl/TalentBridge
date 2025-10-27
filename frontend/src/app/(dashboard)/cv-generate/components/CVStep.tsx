@@ -1,49 +1,97 @@
-// src/components/CVStep.tsx
+"use client";
+import { useState } from "react";
 
-import React from 'react';
-import { useAppDispatch } from '@/redux/hooks';
-import { setCVFile, goToNextStep } from '@/redux/slices/jobApplicationSlice';
+interface CVStepProps {
+  onNext: (cvId: string) => void;
+  onBack: () => void;
+}
 
-const CVStep: React.FC = () => {
-  const dispatch = useAppDispatch();
+export default function CVStep({ onNext, onBack }: CVStepProps) {
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const handleCVUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
+  const handleNext = async () => {
+    if (!cvFile) {
+      setError("Veuillez sélectionner un fichier CV");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", cvFile);
+
+      const res = await fetch("http://localhost:8000/cv/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Erreur HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
       
-      // 1. Save CV file to Redux
-      dispatch(setCVFile(file)); 
-      
-      // 2. Move to the next step: 'Analyse'
-      dispatch(goToNextStep());
+      if (data.cv_id) {
+        onNext(data.cv_id);
+      } else {
+        throw new Error("ID de CV manquant dans la réponse");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors du téléchargement");
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div className="text-center p-12 border-2 border-dashed border-teal-300 bg-teal-50 rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-teal-800">
-        Step 2: Upload Your CV 📄
-      </h2>
-      <p className="text-lg text-gray-600 mb-6">
-        Please upload your Curriculum Vitae (PDF or DOCX).
-      </p>
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold">Étape 2: Téléchargez votre CV</h2>
       
-      <input
-        type="file"
-        accept=".pdf,.docx"
-        onChange={handleCVUpload}
-        className="hidden"
-        id="cv-upload-input"
-      />
-      
-      <label 
-        htmlFor="cv-upload-input" 
-        className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full cursor-pointer shadow-lg transition duration-300"
-      >
-        Drag or Upload CV Document
-      </label>
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+        <input
+          type="file"
+          accept=".pdf,.docx"
+          onChange={(e) => {
+            setCvFile(e.target.files?.[0] || null);
+            setError("");
+          }}
+          className="w-full"
+          disabled={uploading}
+        />
+        
+        {cvFile && (
+          <p className="mt-2 text-sm text-gray-600">
+            Fichier sélectionné: {cvFile.name}
+          </p>
+        )}
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      <div className="flex gap-4">
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+          disabled={uploading}
+        >
+          Retour
+        </button>
+        <button
+          onClick={handleNext}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={uploading || !cvFile}
+        >
+          {uploading ? "Téléchargement..." : "Suivant"}
+        </button>
+      </div>
     </div>
   );
-};
-
-export default CVStep;
+}

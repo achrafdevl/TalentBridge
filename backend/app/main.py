@@ -11,6 +11,9 @@ from app.routes import (
     language_routes,    
     education_routes,
     cv_profile_routes,
+    cv_routes, 
+    job_routes, 
+    generate_routes
 )
 from app.auth import auth_routes
 
@@ -47,6 +50,11 @@ app.include_router(language_routes.router)
 app.include_router(experience_routes.router)
 app.include_router(education_routes.router)
 app.include_router(certification_routes.router)
+
+# Generate CV routes
+app.include_router(cv_routes.router)
+app.include_router(job_routes.router)
+app.include_router(generate_routes.router)
 
 @app.get("/")
 def root():

@@ -8,8 +8,15 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     PROJECT_NAME: str = "TalentBridge"
 
+    # Ollama-related
+    OLLAMA_API_URL: str
+    OLLAMA_MODEL: str
+    MONGODB_URL: str
+    DATABASE_NAME: str
+
     model_config = {
-        "env_file": ".env"
+        "env_file": ".env",
+        "extra": "forbid"  # strict mode
     }
 
 settings = Settings()

@@ -2,12 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import cvProfileReducer from "./slices/cvProfileSlice";
 import jobApplicationReducer from "./slices/jobApplicationSlice";
+import cvReducer from "./slices/cvSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     cvProfile: cvProfileReducer,
     jobApplication: jobApplicationReducer,
+    cv: cvReducer,
+
   },
 });
 
