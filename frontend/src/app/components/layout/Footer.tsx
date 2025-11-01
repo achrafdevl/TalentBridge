@@ -208,7 +208,7 @@ export default function Footer() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-gray-400 text-center md:text-left">
               <p className="mb-2">© 2024 TalentBridge. Tous droits réservés.</p>
-              <p className="text-sm">Fait avec ❤️ à Paris, France</p>
+              <p className="text-sm">Fait avec ❤️ à Casablanca, Maroc.</p>
             </div>
 
             <div className="flex items-center gap-4">

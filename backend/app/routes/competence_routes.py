@@ -5,6 +5,7 @@ from ..database import competences_collection
 from ..auth.dependencies import get_current_user
 from bson import ObjectId
 
+
 router = APIRouter(prefix="/competences", tags=["Competences"])
 
 @router.post("/", response_model=CompetenceInDB)

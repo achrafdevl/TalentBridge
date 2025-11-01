@@ -106,8 +106,7 @@ export default function UserProfileSection() {
       setIsEditing(false);
     } catch (err: unknown) {
       console.error("Failed to save profile:", err);
-      // Error will be displayed in the UI via the error state in Redux
-      // Alert is redundant here
+      
     }
   };
 

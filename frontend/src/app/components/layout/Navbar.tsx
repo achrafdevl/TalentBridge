@@ -18,7 +18,7 @@ export default function Navbar() {
               <Image
                 src="/TalentBridge2.png"
                 alt="TalentBridge"
-                className=""
+                className=" w-24 h-10 sm:w-28 sm:h-12 md:w-32 md:h-14 lg:w-36 lg:h-16 "
                 width={180}
                 height={180}
               />

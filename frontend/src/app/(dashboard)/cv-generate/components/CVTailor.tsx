@@ -14,8 +14,8 @@ export default function CVTailor() {
   const steps = [
     { id: 1, title: "Offre d'emploi" },
     { id: 2, title: "Télécharger CV" },
-    { id: 3, title: "Génération" },
-    { id: 4, title: "Résultat" },
+    { id: 3, title: "Analyse & Génération" },
+    { id: 4, title: "Résultat" }
   ];
 
   const handleJobNext = (id: string) => {
@@ -33,10 +33,7 @@ export default function CVTailor() {
     setCurrentStep(4);
   };
 
-  const handleBack = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
+  const handleBack = () => setCurrentStep((p) => Math.max(p - 1, 1));
   const handleRestart = () => {
     setCurrentStep(1);
     setJobId("");
@@ -46,11 +43,8 @@ export default function CVTailor() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-8 text-indigo-700">
-        Générateur de CV Personnalisé
-      </h1>
+      <h1 className="text-3xl font-bold text-center mb-8 text-indigo-700">Générateur de CV Personnalisé</h1>
 
-      {/* Progress Bar */}
       <div className="flex justify-between mb-10 relative">
         {steps.map((step, index) => (
           <div key={step.id} className="flex-1 flex items-center">
@@ -60,16 +54,14 @@ export default function CVTailor() {
                 style={{
                   width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
                   background: "#4f46e5",
-                  transition: "width 0.3s ease",
+                  transition: "width 0.3s ease"
                 }}
               />
             )}
             <div className="relative z-10 flex flex-col items-center text-center w-full">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-all ${
-                  currentStep >= step.id
-                    ? "bg-indigo-600 text-white scale-110"
-                    : "bg-gray-300 text-gray-600"
+                  currentStep >= step.id ? "bg-indigo-600 text-white scale-110" : "bg-gray-300 text-gray-600"
                 }`}
               >
                 {currentStep > step.id ? "✓" : step.id}
@@ -82,19 +74,11 @@ export default function CVTailor() {
         ))}
       </div>
 
-      {/* Step Components */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         {currentStep === 1 && <JobStep onNext={handleJobNext} />}
         {currentStep === 2 && <CVStep onNext={handleCVNext} onBack={handleBack} />}
-        {currentStep === 3 && (
-          <LoadingStep
-            cvId={cvId}
-            jobId={jobId}
-            onNext={handleGenerationNext}
-            onBack={handleBack}
-          />
-        )}
-        {currentStep === 4 && <ResultStep generatedId={generatedId} onBack={handleRestart} />}
+        {currentStep === 3 && <LoadingStep cvId={cvId} jobId={jobId} onNext={handleGenerationNext} onBack={handleBack} />}
+        {currentStep === 4 && <ResultStep generatedId={generatedId} cvId={cvId} jobId={jobId} onBack={handleRestart} />}
       </div>
     </div>
   );

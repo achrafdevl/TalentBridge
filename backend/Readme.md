@@ -1,4 +1,7 @@
-cd backend && python -m uvicorn app.main:app --reload
+
+cd backend && source .venv311/Scripts/activate && python -m uvicorn app.main:app --reload
+*** add matching of job offre and our cv  by using nlp  **** pymupdf
+
 
 backend/
 │── app/

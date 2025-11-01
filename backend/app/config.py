@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     model_config = {
         "env_file": ".env",
-        "extra": "forbid"  # strict mode
+        "extra": "forbid" 
     }
 
 settings = Settings()
