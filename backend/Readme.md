@@ -2,6 +2,15 @@
 cd backend && source .venv311/Scripts/activate && python -m uvicorn app.main:app --reload
 *** add matching of job offre and our cv  by using nlp  **** pymupdf
 
+Tailored cover letters: Generate a personalized cover letter aligned with the job.
+
+exrtractions des entités
+tableau
+hagging face search 
+
+Interview prep: Generate likely interview questions based on CV + job description and propose AI‑crafted answers.
+
+Application success prediction: Use ML to predict the chance of getting an interview.
 
 backend/
 │── app/

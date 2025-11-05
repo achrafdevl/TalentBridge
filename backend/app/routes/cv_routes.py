@@ -33,7 +33,7 @@ def extract_text_from_file(file_path: Path) -> str:
         raise HTTPException(status_code=400, detail="Unsupported file format (PDF/DOCX only)")
 
 @router.post("/upload")
-async def upload_cv(file: UploadFile = File(...)) -> dict:
+async def upload_cv(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)) -> dict:
     """Upload CV file and extract text content"""
     if not file.filename.endswith(('.pdf', '.docx')):
         raise HTTPException(status_code=400, detail="Only PDF and DOCX files are supported")
@@ -51,7 +51,8 @@ async def upload_cv(file: UploadFile = File(...)) -> dict:
         "filename": file.filename,
         "file_path": str(save_path),
         "raw_text": cv_text,
-        "upload_date": datetime.utcnow()
+        "upload_date": datetime.utcnow(),
+        "user_id": str(current_user["_id"])
     }
 
     result = await cvs_collection.insert_one(cv_document)
@@ -66,53 +67,51 @@ async def upload_cv(file: UploadFile = File(...)) -> dict:
 @router.post("/from-profile")
 async def create_cv_from_profile(current_user: dict = Depends(get_current_user)) -> dict:
     """Create a CV document from user's CV profile"""
+    user_id = str(current_user["_id"])
     try:
-        user_id = str(current_user["_id"])
         cv_text = await cv_profile_to_text(user_id)
-        
-        cv_document = {
-            "filename": f"profile_cv_{user_id[:8]}.txt",
-            "file_path": None,
-            "raw_text": cv_text,
-            "upload_date": datetime.utcnow(),
-            "from_profile": True,
-            "user_id": user_id
-        }
-        
-        result = await cvs_collection.insert_one(cv_document)
-        cv_id = str(result.inserted_id)
-        
-        return {
-            "cv_id": cv_id,
-            "filename": "CV depuis profil",
-            "raw_text_preview": cv_text[:500] + "..." if len(cv_text) > 500 else cv_text
-        }
-    except HTTPException:
-        raise
     except ValueError as e:
         logger.error(f"CV profile not found: {e}")
-        raise HTTPException(status_code=404, detail=f"CV profile not found. Please create your CV profile first. {str(e)}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"CV profile not found. Please create your CV profile first. {str(e)}"
+        )
     except Exception as e:
         logger.error(f"Failed to create CV from profile: {e}", exc_info=True)
-        error_msg = str(e)
-        if "profile not found" in error_msg.lower() or "not found" in error_msg.lower():
-            raise HTTPException(
-                status_code=404, 
-                detail="CV profile not found. Please complete your CV profile before generating a CV."
-            )
         raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to create CV from profile. Please try again. Error: {error_msg}"
+            status_code=500,
+            detail=f"Failed to create CV from profile. Error: {str(e)}"
         )
 
+    cv_document = {
+        "filename": f"profile_cv_{user_id[:8]}.txt",
+        "file_path": None,
+        "raw_text": cv_text,
+        "upload_date": datetime.utcnow(),
+        "from_profile": True,
+        "user_id": user_id
+    }
+
+    result = await cvs_collection.insert_one(cv_document)
+    cv_id = str(result.inserted_id)
+
+    return {
+        "cv_id": cv_id,
+        "filename": "CV depuis profil",
+        "raw_text_preview": cv_text[:500] + "..." if len(cv_text) > 500 else cv_text
+    }
+
 @router.get("/{cv_id}")
-async def get_cv(cv_id: str) -> dict:
-    """Retrieve CV by ID"""
+async def get_cv(cv_id: str, current_user: dict = Depends(get_current_user)) -> dict:
+    """Retrieve CV by ID (only owner can access)"""
     try:
         cv = await cvs_collection.find_one({"_id": ObjectId(cv_id)})
         if not cv:
             raise HTTPException(status_code=404, detail="CV not found")
+        if str(cv.get("user_id")) != str(current_user["_id"]):
+            raise HTTPException(status_code=403, detail="Forbidden: You do not own this CV")
         cv["_id"] = str(cv["_id"])
         return cv
     except Exception as e:
+        logger.error(f"Failed to get CV: {e}")
         raise HTTPException(status_code=400, detail=f"Invalid CV ID: {str(e)}")

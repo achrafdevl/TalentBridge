@@ -34,19 +34,20 @@ export default function CVStep({ onNext, onBack }: CVStepProps) {
           return;
         }
 
-        const formData = new FormData();
-        formData.append("file", cvFile);
-
-        const API_BASE =
-          process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-        const res = await fetch(`${API_BASE}/cv/upload`, {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) throw new Error(`Erreur HTTP: ${res.status}`);
-        const data = await res.json();
-        if (!data.cv_id) throw new Error("ID de CV manquant");
-        cvId = data.cv_id;
+        try {
+          const data = await api.uploadCV(cvFile);
+          if (!data.cv_id) throw new Error("ID de CV manquant");
+          cvId = data.cv_id;
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Erreur lors du téléchargement";
+          // Normalize common 401 message for the UI
+          if (msg.includes("401") || msg.toLowerCase().includes("auth")) {
+            throw new Error(
+              "Authentification requise. Veuillez vous connecter puis réessayer."
+            );
+          }
+          throw new Error(msg);
+        }
       } else {
         // Use profile
         const data = await api.createCVFromProfile();

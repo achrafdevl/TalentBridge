@@ -1,13 +1,41 @@
+import Cookies from "js-cookie";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
 export const uploadCV = async (file: File) => {
+  const token = Cookies.get("tb_token");
+  if (!token) {
+    throw new Error(
+      "Authentication required. Please log in to upload your CV."
+    );
+  }
+
   const fd = new FormData();
   fd.append("file", file);
+
   const res = await fetch(`${API_BASE}/cv/upload`, {
     method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
     body: fd,
   });
-  if (!res.ok) throw new Error(`uploadCV failed ${res.status}`);
+
+  if (!res.ok) {
+    let errorMessage = `Upload failed (${res.status})`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      const txt = await res.text();
+      if (txt) errorMessage = txt;
+    }
+
+    if (res.status === 401) {
+      errorMessage = `${errorMessage} Please log in again.`;
+    }
+
+    throw new Error(errorMessage);
+  }
+
   return res.json();
 };
 
@@ -15,8 +43,8 @@ export const createCVFromProfile = async (): Promise<{
   cv_id: string;
   filename: string;
 }> => {
-  // Get auth token from localStorage
-  const token = localStorage.getItem("token");
+  // Get auth token from cookie (kept in sync with auth slice)
+  const token = Cookies.get("tb_token");
 
   if (!token) {
     throw new Error(

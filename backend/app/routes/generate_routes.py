@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter, Form, HTTPException, Depends
 from fastapi.responses import FileResponse
 from pathlib import Path
 from datetime import datetime
@@ -6,6 +6,7 @@ from docx import Document
 from docx.shared import Pt
 from bson import ObjectId
 from app.database import cvs_collection, jobs_collection, tailored_cvs_collection
+from app.auth.dependencies import get_current_user
 from app.services.ollama_client import generate_tailored_cv
 from app.services.cv_profile_service import cv_profile_to_text
 from app.routes.analysis_routes import analyze_cv_job  # reuse logic
@@ -118,7 +119,7 @@ def create_docx(content: str, output_path: Path, job_title: str):
                     heading_format = heading.runs[0].font
                     heading_format.size = Pt(14)
                     heading_format.bold = True
-                    heading_format.color = RGBColor(0, 51, 102)  # Dark blue
+                    heading_format.color.rgb = RGBColor(0, 51, 102)
                     # Add underline to main section headings
                     heading.runs[0].underline = True
                 
@@ -131,7 +132,7 @@ def create_docx(content: str, output_path: Path, job_title: str):
                     subheading_format = subheading.runs[0].font
                     subheading_format.size = Pt(12)
                     subheading_format.bold = True
-                    subheading_format.color = RGBColor(0, 0, 0)  # Black
+                    subheading_format.color.rgb = RGBColor(0, 0, 0)  # Black
                 
         # Handle bullet points
         elif line.startswith('-') or line.startswith('•') or line.startswith('*'):
@@ -156,7 +157,7 @@ def create_docx(content: str, output_path: Path, job_title: str):
                     # Likely a date range or location line
                     p_format.size = Pt(10)
                     p_format.italic = True
-                    p_format.color = RGBColor(64, 64, 64)  # Gray
+                    p_format.color.rgb = RGBColor(64, 64, 64)  # Gray
                 else:
                     p_format.size = Pt(11)
             
@@ -181,3 +182,33 @@ async def download_generated(generated_id: str):
         filename=f"CV_Personnalise_{generated_id}.docx",
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
+
+@router.get("/history")
+async def list_generated_history(current_user: dict = Depends(get_current_user)) -> dict:
+    """Return generated CVs for the current user with basic joined info."""
+    try:
+        # Find all tailored cvs, then filter by those whose CV belongs to current user
+        items_cursor = tailored_cvs_collection.find({}).sort("created_at", -1)
+        items = []
+        async for it in items_cursor:
+            cv = await cvs_collection.find_one({"_id": ObjectId(it.get("cv_id"))}) if it.get("cv_id") else None
+            if not cv:
+                continue
+            # Only include if owned by current user
+            if str(cv.get("user_id")) != str(current_user["_id"]):
+                continue
+            job = await jobs_collection.find_one({"_id": ObjectId(it.get("job_id"))}) if it.get("job_id") else None
+            items.append({
+                "generated_id": it.get("generated_id"),
+                "cv_id": it.get("cv_id"),
+                "job_id": it.get("job_id"),
+                "similarity": it.get("similarity"),
+                "created_at": it.get("created_at").isoformat() if it.get("created_at") else None,
+                "download_url": f"/generate/download/{it.get('generated_id')}",
+                "cv_name": cv.get("filename") or cv.get("name") or "CV",
+                "job_title": (job or {}).get("title") or (job or {}).get("name") or "Offre",
+            })
+        return {"items": items}
+    except Exception as e:
+        logger.error(f"Error listing generated history: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load generated CV history")
