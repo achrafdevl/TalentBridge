@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer, util
 import re
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('thenlper/gte-base')
 
 def preprocess(text: str) -> str:
     text = re.sub(r'\s+', ' ', text)

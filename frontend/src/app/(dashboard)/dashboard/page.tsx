@@ -266,14 +266,14 @@ export default function Dashboard() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <button
-              onClick={() => router.push("/dashboard/generate")}
+              onClick={() => router.push("/cv-generate")}
               className="p-6 rounded-2xl bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all font-semibold flex items-center justify-center gap-3 border-2 border-white/30 hover:border-white/50 hover:scale-105 transform duration-200"
             >
               <FaPlus className="text-2xl" />
               <span className="text-lg">Générer un Nouveau CV</span>
             </button>
             <button
-              onClick={() => router.push("/dashboard/history")}
+              onClick={() => router.push("/mes-CV")}
               className="p-6 rounded-2xl bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-all font-semibold flex items-center justify-center gap-3 border-2 border-white/30 hover:border-white/50 hover:scale-105 transform duration-200"
             >
               <FaHistory className="text-2xl" />

@@ -1,3 +1,4 @@
+
 import fitz  # PyMuPDF
 import pdfplumber
 from fastapi import HTTPException
@@ -60,4 +61,7 @@ def extract_text_from_file(file_path: Path) -> str:
 
     # --- Unsupported ---
     else:
-        raise HTTPException(status_code=400, detail="Unsupported file format (PDF/DOCX/TXT only)")
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file format (PDF/DOCX/TXT only)"
+        )
