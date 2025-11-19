@@ -90,6 +90,38 @@ export const createCVFromProfile = async (): Promise<{
   return res.json();
 };
 
+export const getCvDetails = async (cvId: string) => {
+  const token = Cookies.get("tb_token");
+  if (!token) {
+    throw new Error("Authentication required. Please log in to view your CV.");
+  }
+
+  const res = await fetch(`${API_BASE}/cv/${cvId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    let errorMessage = `Failed to fetch CV (${res.status})`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      const txt = await res.text();
+      if (txt) errorMessage = txt;
+    }
+
+    if (res.status === 401) {
+      errorMessage = `${errorMessage} Please log in again.`;
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  return res.json();
+};
+
 export const uploadJob = async (params: {
   title?: string;
   file?: File;

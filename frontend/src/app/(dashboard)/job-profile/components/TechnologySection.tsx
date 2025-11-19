@@ -78,7 +78,7 @@ export default function TechnologySection() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl border-0 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <SectionHeader
         title="Technologies"
         icon={<FaCode />}
@@ -86,15 +86,15 @@ export default function TechnologySection() {
         onToggle={() => setIsExpanded(!isExpanded)}
       />
       {isExpanded && (
-        <div className="p-6 space-y-4">
+        <div className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {technologies.map((tech) =>
               editingId === tech.id && editingData ? (
-                <div key={tech.id} className="border rounded-lg p-4 space-y-3">
+                <div key={tech.id} className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 space-y-4">
                   <input
                     type="text"
                     placeholder="Technology Name"
-                    className="text-gray-800 input w-full px-3 py-2 border rounded-lg text-sm"
+                    className="text-gray-800 input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.name}
                     onChange={(e) =>
                       setEditingData({ ...editingData, name: e.target.value })
@@ -103,7 +103,7 @@ export default function TechnologySection() {
                   <input
                     type="text"
                     placeholder="Category (e.g., Frontend, Backend)"
-                    className="text-gray-800 input w-full px-3 py-2 border rounded-lg text-sm"
+                    className="text-gray-800 input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.category}
                     onChange={(e) =>
                       setEditingData({
@@ -115,14 +115,14 @@ export default function TechnologySection() {
                   <input
                     type="text"
                     placeholder="Icon (emoji)"
-                    className="text-gray-800 input w-full px-3 py-2 border rounded-lg text-sm"
+                    className="text-gray-800 input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.icon || ""}
                     onChange={(e) =>
                       setEditingData({ ...editingData, icon: e.target.value })
                     }
                   />
                   <select
-                    className="text-gray-800 input w-full px-3 py-2 border rounded-lg text-sm"
+                    className="text-gray-800 input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.level || "Intermediate"}
                     onChange={(e) =>
                       setEditingData({ ...editingData, level: e.target.value })
@@ -133,64 +133,68 @@ export default function TechnologySection() {
                     <option value="Advanced">Advanced</option>
                     <option value="Expert">Expert</option>
                   </select>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-3 pt-2">
                     <button
                       onClick={() => {
                         const { id, ...data } = editingData;
                         handleSaveEdit(id, data);
                       }}
-                      className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                     >
-                      Save
+                      Enregistrer
                     </button>
                     <button
                       onClick={() => {
                         setEditingId(null);
                         setEditingData(null);
                       }}
-                      className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                      className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                     >
-                      Cancel
+                      Annuler
                     </button>
                   </div>
                 </div>
               ) : (
                 <div
                   key={tech.id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow relative group"
+                  className="group relative p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 hover:border-[#1C96AD] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleRemove(tech.id)}
-                      className="p-1 text-red-500 hover:bg-red-50 rounded"
+                      className="p-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                      title="Supprimer"
                     >
-                      <FaTrash size={12} />
+                      <FaTrash size={16} />
                     </button>
                     <button
                       onClick={() => handleEdit(tech.id)}
-                      className="p-1 text-teal-500 hover:bg-teal-50 rounded"
+                      className="p-2 text-white bg-gradient-to-r from-[#1C96AD] to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                      title="Modifier"
                     >
-                      <FaEdit size={12} />
+                      <FaEdit size={16} />
                     </button>
                   </div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span className="text-2xl">{tech.icon || "💻"}</span>
-                    <div>
-                      <h5 className="font-semibold text-gray-800">
-                        {tech.name}
-                      </h5>
-                      <p className="text-xs text-gray-500">{tech.category}</p>
+                  <div className="pr-24">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <span className="text-3xl">{tech.icon || "💻"}</span>
+                      <div>
+                        <h5 className="text-lg font-bold text-gray-900">
+                          {tech.name}
+                        </h5>
+                        <p className="text-sm text-gray-600">{tech.category}</p>
+                      </div>
                     </div>
+                    {tech.level && (
+                      <span
+                        className={`text-xs px-3 py-1.5 rounded-full font-medium ${getTechLevelColor(
+                          tech.level
+                        )}`}
+                      >
+                        {tech.level}
+                      </span>
+                    )}
                   </div>
-                  {tech.level && (
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${getTechLevelColor(
-                        tech.level
-                      )}`}
-                    >
-                      {tech.level}
-                    </span>
-                  )}
                 </div>
               )
             )}
@@ -202,7 +206,7 @@ export default function TechnologySection() {
                 <input
                   type="text"
                   placeholder="Technology Name"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newTechnology.name}
                   onChange={(e) =>
                     setNewTechnology({ ...newTechnology, name: e.target.value })
@@ -211,7 +215,7 @@ export default function TechnologySection() {
                 <input
                   type="text"
                   placeholder="Category (e.g., Frontend, Backend)"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newTechnology.category}
                   onChange={(e) =>
                     setNewTechnology({
@@ -223,14 +227,14 @@ export default function TechnologySection() {
                 <input
                   type="text"
                   placeholder="Icon (emoji)"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newTechnology.icon}
                   onChange={(e) =>
                     setNewTechnology({ ...newTechnology, icon: e.target.value })
                   }
                 />
                 <select
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newTechnology.level}
                   onChange={(e) =>
                     setNewTechnology({
@@ -245,18 +249,18 @@ export default function TechnologySection() {
                   <option value="Expert">Expert</option>
                 </select>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 pt-2">
                 <button
                   onClick={handleAdd}
-                  className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                 >
-                  Save
+                  Enregistrer
                 </button>
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
@@ -265,10 +269,10 @@ export default function TechnologySection() {
           {!isAdding && (
             <button
               onClick={() => setIsAdding(true)}
-              className="w-full mt-4 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg flex items-center justify-center space-x-2 hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 px-6 py-3 border-2 border-dashed border-[#1C96AD] text-[#1C96AD] rounded-xl flex items-center justify-center space-x-2 hover:bg-[#1C96AD]/5 transition-colors font-medium"
             >
               <FaPlus />
-              <span>Add New Technology</span>
+              <span>Ajouter une Technologie</span>
             </button>
           )}
         </div>

@@ -73,7 +73,7 @@ export default function ExperienceSection() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl border-0 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <SectionHeader
         title="Professional Experiences"
         icon={<FaBuilding />}
@@ -81,12 +81,12 @@ export default function ExperienceSection() {
         onToggle={() => setIsExpanded(!isExpanded)}
       />
       {isExpanded && (
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-6">
           {experiences.map((exp) =>
             editingId === exp.id && editingData ? (
               <div
                 key={exp.id}
-                className="border-b pb-4 last:border-none space-y-4"
+                className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 space-y-4"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
@@ -99,7 +99,7 @@ export default function ExperienceSection() {
                         position: e.target.value,
                       })
                     }
-                    className="input px-4 py-2 border rounded-lg text-gray-800"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                   <input
                     type="text"
@@ -111,7 +111,7 @@ export default function ExperienceSection() {
                         company: e.target.value,
                       })
                     }
-                    className="input px-4 py-2 border rounded-lg text-gray-800"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                   <input
                     type="text"
@@ -123,7 +123,7 @@ export default function ExperienceSection() {
                         location: e.target.value,
                       })
                     }
-                    className="input px-4 py-2 border rounded-lg text-gray-800"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                   <input
                     type="text"
@@ -135,7 +135,7 @@ export default function ExperienceSection() {
                         startDate: e.target.value,
                       })
                     }
-                    className="input px-4 py-2 border rounded-lg text-gray-800"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                   <input
                     type="text"
@@ -147,12 +147,12 @@ export default function ExperienceSection() {
                         endDate: e.target.value,
                       })
                     }
-                    className="input px-4 py-2 border rounded-lg text-gray-800"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                 </div>
                 <textarea
                   placeholder="Responsibilities"
-                  rows={3}
+                  rows={4}
                   value={editingData.responsibilities}
                   onChange={(e) =>
                     setEditingData({
@@ -160,13 +160,13 @@ export default function ExperienceSection() {
                       responsibilities: e.target.value,
                     })
                   }
-                  className="input w-full px-4 py-2 border rounded-lg text-gray-800"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all resize-none"
                 />
                 <div className="flex flex-wrap gap-2">
                   {editingData.technologies?.map((tech, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center space-x-1 bg-blue-100 text-blue-700 rounded px-2 py-1 text-xs"
+                      className="flex items-center space-x-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl px-3 py-1.5 text-sm font-medium shadow-sm"
                     >
                       <span>{tech}</span>
                       <button
@@ -180,6 +180,7 @@ export default function ExperienceSection() {
                               ) || [],
                           })
                         }
+                        className="ml-2 hover:text-blue-900 transition-colors"
                       >
                         ✖
                       </button>
@@ -201,80 +202,84 @@ export default function ExperienceSection() {
                         e.currentTarget.value = "";
                       }
                     }}
-                    className="input px-2 py-1 border rounded text-xs"
+                    className="input px-3 py-1.5 border-2 border-gray-200 rounded-xl text-sm focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   />
                 </div>
-                <div className="flex space-x-3 mt-2">
+                <div className="flex space-x-3 pt-2">
                   <button
                     onClick={() => {
                       const { id, ...data } = editingData;
                       handleSaveEdit(id, data);
                     }}
-                    className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                    className="px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                   >
-                    Save
+                    Enregistrer
                   </button>
                   <button
                     onClick={() => {
                       setEditingId(null);
                       setEditingData(null);
                     }}
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    className="px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 key={exp.id}
-                className="border-b pb-4 last:border-none relative group"
+                className="group relative p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 hover:border-[#1C96AD] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="absolute top-0 right-0 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleRemove(exp.id)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
                   >
-                    <FaTrash />
+                    <FaTrash size={16} />
                   </button>
                   <button
                     onClick={() => handleEdit(exp.id)}
-                    className="p-2 text-teal-500 hover:bg-teal-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-[#1C96AD] to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
                   >
-                    <FaEdit />
+                    <FaEdit size={16} />
                   </button>
                 </div>
-                <div className="flex flex-col md:flex-row md:justify-between mb-1">
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    {exp.position}
-                  </h4>
-                  <div className="text-sm text-gray-500 flex items-center space-x-2">
-                    <FaCalendarAlt className="text-teal-500" />
-                    <span>
-                      {exp.startDate} - {exp.endDate}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-gray-700 font-medium">{exp.company}</div>
-                <div className="text-sm text-gray-500 flex items-center space-x-2">
-                  <FaMapMarkerAlt className="text-gray-400" />
-                  <span>{exp.location}</span>
-                </div>
-                <p className="text-gray-600 text-sm mt-2">
-                  {exp.responsibilities}
-                </p>
-                {exp.technologies && exp.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {exp.technologies.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs"
-                      >
-                        {tech}
+                <div className="pr-24">
+                  <div className="flex flex-col md:flex-row md:justify-between mb-3">
+                    <h4 className="text-xl font-bold text-gray-900">
+                      {exp.position}
+                    </h4>
+                    <div className="text-sm text-gray-600 flex items-center space-x-2 mt-2 md:mt-0">
+                      <FaCalendarAlt className="text-[#1C96AD]" />
+                      <span className="font-medium">
+                        {exp.startDate} - {exp.endDate}
                       </span>
-                    ))}
+                    </div>
                   </div>
-                )}
+                  <div className="text-lg font-semibold text-gray-800 mb-2">
+                    {exp.company}
+                  </div>
+                  <div className="text-sm text-gray-600 flex items-center space-x-2 mb-3">
+                    <FaMapMarkerAlt className="text-gray-500" />
+                    <span>{exp.location}</span>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed mb-3 p-4 bg-white/60 rounded-xl border border-gray-200">
+                    {exp.responsibilities}
+                  </p>
+                  {exp.technologies && exp.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {exp.technologies.map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl text-xs font-medium shadow-sm"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )
           )}
@@ -285,7 +290,7 @@ export default function ExperienceSection() {
                 <input
                   type="text"
                   placeholder="Position"
-                  className="input px-4 py-2 border rounded-lg text-gray-800"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newExperience.position}
                   onChange={(e) =>
                     setNewExperience({
@@ -297,7 +302,7 @@ export default function ExperienceSection() {
                 <input
                   type="text"
                   placeholder="Company"
-                  className="input px-4 py-2 border rounded-lg text-gray-800"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newExperience.company}
                   onChange={(e) =>
                     setNewExperience({
@@ -309,7 +314,7 @@ export default function ExperienceSection() {
                 <input
                   type="text"
                   placeholder="Location"
-                  className="input px-4 py-2 border rounded-lg text-gray-800"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newExperience.location}
                   onChange={(e) =>
                     setNewExperience({
@@ -321,7 +326,7 @@ export default function ExperienceSection() {
                 <input
                   type="text"
                   placeholder="Start Date"
-                  className="input px-4 py-2 border rounded-lg text-gray-800"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newExperience.startDate}
                   onChange={(e) =>
                     setNewExperience({
@@ -333,7 +338,7 @@ export default function ExperienceSection() {
                 <input
                   type="text"
                   placeholder="End Date"
-                  className="input px-4 py-2 border rounded-lg text-gray-800"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newExperience.endDate}
                   onChange={(e) =>
                     setNewExperience({
@@ -345,7 +350,7 @@ export default function ExperienceSection() {
               </div>
               <textarea
                 placeholder="Responsibilities"
-                className="input w-full px-4 py-2 border rounded-lg text-gray-800"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all resize-none"
                 rows={4}
                 value={newExperience.responsibilities}
                 onChange={(e) =>
@@ -358,7 +363,7 @@ export default function ExperienceSection() {
               <input
                 type="text"
                 placeholder="Technologies (comma-separated)"
-                className="input w-full px-4 py-2 border rounded-lg text-gray-800"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && e.currentTarget.value.trim()) {
                     const techs = e.currentTarget.value
@@ -370,18 +375,18 @@ export default function ExperienceSection() {
                   }
                 }}
               />
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 pt-2">
                 <button
                   onClick={handleAdd}
-                  className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                 >
-                  Save
+                  Enregistrer
                 </button>
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
@@ -390,10 +395,10 @@ export default function ExperienceSection() {
           {!isAdding && (
             <button
               onClick={() => setIsAdding(true)}
-              className="w-full mt-4 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg flex items-center justify-center space-x-2 hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 px-6 py-3 border-2 border-dashed border-[#1C96AD] text-[#1C96AD] rounded-xl flex items-center justify-center space-x-2 hover:bg-[#1C96AD]/5 transition-colors font-medium"
             >
               <FaPlus />
-              <span>Add New Experience</span>
+              <span>Ajouter une Expérience</span>
             </button>
           )}
         </div>

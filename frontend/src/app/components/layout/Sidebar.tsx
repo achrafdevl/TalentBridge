@@ -56,6 +56,12 @@ const menuItems = [
     path: "/profile",
     badge: null,
   },
+  {
+    title: "CV details",
+    icon: FaCog,
+    path: "/exrtractions",
+    badge: null,
+  },
 ];
 
 export default function Sidebar() {
@@ -90,7 +96,12 @@ export default function Sidebar() {
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Image src="/Logo.png" alt="TalentBridge" width={200} height={200} />
+              <Image
+                src="/Logo.png"
+                alt="TalentBridge"
+                width={200}
+                height={200}
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-wide">TalentBridge</h1>
@@ -217,14 +228,12 @@ export default function Sidebar() {
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
               {user?.profile_image ? (
                 <Image
-                src="/Logo.png"   // or /default-avatar.png if you add one later
-                alt={user.full_name}
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
-              />
-              
-              
+                  src="/Logo.png" // or /default-avatar.png if you add one later
+                  alt={user.full_name}
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover"
+                />
               ) : (
                 <FaUser className="w-4 h-4" />
               )}
@@ -233,9 +242,7 @@ export default function Sidebar() {
               <p className="text-sm font-semibold truncate">
                 {user?.full_name}
               </p>
-              <p className="text-xs opacity-75 truncate">
-                {user?.email}
-              </p>
+              <p className="text-xs opacity-75 truncate">{user?.email}</p>
             </div>
           </div>
         )}

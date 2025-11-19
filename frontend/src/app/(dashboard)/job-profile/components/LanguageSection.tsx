@@ -58,7 +58,7 @@ export default function LanguageSection() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl border-0 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <SectionHeader
         title="Languages"
         icon={<span>🌐</span>}
@@ -66,24 +66,24 @@ export default function LanguageSection() {
         onToggle={() => setIsExpanded(!isExpanded)}
       />
       {isExpanded && (
-        <div className="p-4 space-y-2">
+        <div className="p-8 space-y-4">
           {languages.map((lang, idx) =>
             editingIndex === idx && editingData ? (
               <div
                 key={lang.id || idx}
-                className="border rounded p-3 space-y-2"
+                className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 space-y-3"
               >
                 <input
                   type="text"
                   placeholder="Language"
-                  className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={editingData.name}
                   onChange={(e) =>
                     setEditingData({ ...editingData, name: e.target.value })
                   }
                 />
                 <select
-                  className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={editingData.level}
                   onChange={(e) =>
                     setEditingData({ ...editingData, level: e.target.value })
@@ -96,7 +96,7 @@ export default function LanguageSection() {
                   <option value="Intermediate">Intermediate</option>
                   <option value="Basic">Basic</option>
                 </select>
-                <div className="flex space-x-2">
+                <div className="flex space-x-3 pt-2">
                   <button
                     onClick={() => {
                       if (editingData.id) {
@@ -104,44 +104,50 @@ export default function LanguageSection() {
                         handleSaveEdit(id, data);
                       }
                     }}
-                    className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                   >
-                    Save
+                    Enregistrer
                   </button>
                   <button
                     onClick={() => {
                       setEditingIndex(null);
                       setEditingData(null);
                     }}
-                    className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 key={lang.id || idx}
-                className="flex justify-between items-center border-b pb-2 last:border-none relative group"
+                className="group relative p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 hover:border-[#1C96AD] hover:shadow-lg transition-all duration-300"
               >
-                <span className="font-medium text-sm text-gray-800">
-                  {lang.name}
-                </span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">{lang.level}</span>
-                  <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => lang.id && handleRemove(lang.id)}
-                      className="p-1 text-red-500 hover:bg-red-50 rounded"
-                    >
-                      <FaTrash size={10} />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(lang.id!, idx)}
-                      className="p-1 text-teal-500 hover:bg-teal-50 rounded"
-                    >
-                      <FaEdit size={10} />
-                    </button>
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-gray-900">
+                    {lang.name}
+                  </span>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm text-gray-600 font-medium px-3 py-1 bg-white/60 rounded-xl border border-gray-200">
+                      {lang.level}
+                    </span>
+                    <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => lang.id && handleRemove(lang.id)}
+                        className="p-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-sm transition-all hover:scale-110 transform"
+                        title="Supprimer"
+                      >
+                        <FaTrash size={12} />
+                      </button>
+                      <button
+                        onClick={() => handleEdit(lang.id!, idx)}
+                        className="p-2 text-white bg-gradient-to-r from-[#1C96AD] to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-sm transition-all hover:scale-110 transform"
+                        title="Modifier"
+                      >
+                        <FaEdit size={12} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -149,18 +155,18 @@ export default function LanguageSection() {
           )}
 
           {isAdding && (
-            <div className="space-y-2 mt-2">
+            <div className="border-t pt-6 mt-6 space-y-4">
               <input
                 type="text"
                 placeholder="Language"
-                className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 value={newLanguage.name}
                 onChange={(e) =>
                   setNewLanguage({ ...newLanguage, name: e.target.value })
                 }
               />
               <select
-                className="input w-full px-3 py-2 border rounded-lg text-sm text-gray-800"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 value={newLanguage.level}
                 onChange={(e) =>
                   setNewLanguage({ ...newLanguage, level: e.target.value })
@@ -173,18 +179,18 @@ export default function LanguageSection() {
                 <option value="Intermediate">Intermediate</option>
                 <option value="Basic">Basic</option>
               </select>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3 pt-2">
                 <button
                   onClick={handleAdd}
-                  className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                 >
-                  Save
+                  Enregistrer
                 </button>
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
@@ -193,10 +199,10 @@ export default function LanguageSection() {
           {!isAdding && (
             <button
               onClick={() => setIsAdding(true)}
-              className="w-full mt-2 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg flex items-center justify-center space-x-2 text-sm hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 px-6 py-3 border-2 border-dashed border-[#1C96AD] text-[#1C96AD] rounded-xl flex items-center justify-center space-x-2 hover:bg-[#1C96AD]/5 transition-colors font-medium"
             >
               <FaPlus />
-              <span>Add Language</span>
+              <span>Ajouter une Langue</span>
             </button>
           )}
         </div>

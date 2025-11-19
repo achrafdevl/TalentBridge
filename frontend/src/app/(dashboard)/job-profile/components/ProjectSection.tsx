@@ -133,7 +133,7 @@ export default function ProjectSection() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl border-0 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <SectionHeader
         title="Projects"
         icon={<FaProjectDiagram />}
@@ -141,18 +141,18 @@ export default function ProjectSection() {
         onToggle={() => setIsExpanded(!isExpanded)}
       />
       {isExpanded && (
-        <div className="p-6 space-y-6">
+        <div className="p-8 space-y-6">
           {projects.map((project) =>
             editingId === project.id && editingData ? (
               <div
                 key={project.id}
-                className="border-b pb-4 last:border-none space-y-4"
+                className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 space-y-4"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <input
                     type="text"
                     placeholder="Project Title"
-                    className="text-gray-800 input px-4 py-2 border rounded-lg"
+                    className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.title}
                     onChange={(e) =>
                       setEditingData({ ...editingData, title: e.target.value })
@@ -161,7 +161,7 @@ export default function ProjectSection() {
                   <input
                     type="date"
                     placeholder="Date"
-                    className="text-gray-800 input px-4 py-2 border rounded-lg"
+                    className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.date}
                     onChange={(e) =>
                       setEditingData({ ...editingData, date: e.target.value })
@@ -170,7 +170,7 @@ export default function ProjectSection() {
                 </div>
                 <textarea
                   placeholder="Description"
-                  className="input w-full px-4 py-2 border rounded-lg text-gray-800"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all resize-none"
                   rows={3}
                   value={editingData.description}
                   onChange={(e) =>
@@ -190,7 +190,7 @@ export default function ProjectSection() {
                     <input
                       type="text"
                       placeholder="Add technology"
-                      className="input flex-1 px-4 py-2 border rounded-lg text-gray-800"
+                      className="input flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                       value={techInput}
                       onChange={(e) => setTechInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -202,7 +202,7 @@ export default function ProjectSection() {
                     />
                     <button
                       onClick={() => handleAddTech(editingData.id)}
-                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+                      className="px-4 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform"
                     >
                       <FaPlus />
                     </button>
@@ -211,14 +211,14 @@ export default function ProjectSection() {
                     {editingData.technologies?.map((tech, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-indigo-100 text-indigo-600 rounded text-xs flex items-center space-x-1"
+                        className="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl text-sm font-medium shadow-sm flex items-center space-x-1"
                       >
                         <span>{tech}</span>
                         <button
                           onClick={() => handleRemoveTech(tech, editingData.id)}
-                          className="text-indigo-400 hover:text-indigo-600"
+                          className="ml-2 hover:text-blue-900 transition-colors"
                         >
-                          ×
+                          ✖
                         </button>
                       </span>
                     ))}
@@ -234,7 +234,7 @@ export default function ProjectSection() {
                     <input
                       type="text"
                       placeholder="Add tag"
-                      className="input flex-1 px-4 py-2 border rounded-lg text-gray-800"
+                      className="input flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -246,7 +246,7 @@ export default function ProjectSection() {
                     />
                     <button
                       onClick={() => handleAddTag(editingData.id)}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform"
                     >
                       <FaPlus />
                     </button>
@@ -255,14 +255,14 @@ export default function ProjectSection() {
                     {editingData.tags?.map((tag, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs flex items-center space-x-1"
+                        className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-xl text-sm font-medium shadow-sm flex items-center space-x-1"
                       >
                         <span>#{tag}</span>
                         <button
                           onClick={() => handleRemoveTag(tag, editingData.id)}
-                          className="text-gray-400 hover:text-gray-600"
+                          className="ml-2 hover:text-purple-900 transition-colors"
                         >
-                          ×
+                          ✖
                         </button>
                       </span>
                     ))}
@@ -273,7 +273,7 @@ export default function ProjectSection() {
                   <input
                     type="url"
                     placeholder="GitHub Link (Optional)"
-                    className="text-gray-800 input px-4 py-2 border rounded-lg"
+                    className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.githubLink}
                     onChange={(e) =>
                       setEditingData({
@@ -285,7 +285,7 @@ export default function ProjectSection() {
                   <input
                     type="url"
                     placeholder="Live Demo Link (Optional)"
-                    className="text-gray-800 input px-4 py-2 border rounded-lg"
+                    className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.liveDemo}
                     onChange={(e) =>
                       setEditingData({
@@ -295,110 +295,114 @@ export default function ProjectSection() {
                     }
                   />
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex space-x-3 pt-2">
                   <button
                     onClick={() => {
                       const { id, ...data } = editingData;
                       handleSaveEdit(id, data);
                     }}
-                    className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                   >
-                    Save
+                    Enregistrer
                   </button>
                   <button
                     onClick={() => {
                       setEditingId(null);
                       setEditingData(null);
                     }}
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 key={project.id}
-                className="border-b pb-4 last:border-none relative group"
+                className="group relative p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 hover:border-[#1C96AD] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="absolute top-0 right-0 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleRemove(project.id)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                    title="Supprimer"
                   >
-                    <FaTrash />
+                    <FaTrash size={16} />
                   </button>
                   <button
                     onClick={() => handleEdit(project.id)}
-                    className="p-2 text-teal-500 hover:bg-teal-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-[#1C96AD] to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                    title="Modifier"
                   >
-                    <FaEdit />
+                    <FaEdit size={16} />
                   </button>
                 </div>
-                <div className="flex flex-col md:flex-row md:justify-between mb-2">
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    {project.title}
-                  </h4>
-                  {project.date && (
-                    <div className="text-sm text-gray-500 flex items-center space-x-2">
-                      <FaCalendarAlt className="text-teal-500" />
-                      <span>{project.date}</span>
+                <div className="pr-24">
+                  <div className="flex flex-col md:flex-row md:justify-between mb-3">
+                    <h4 className="text-xl font-bold text-gray-900">
+                      {project.title}
+                    </h4>
+                    {project.date && (
+                      <div className="text-sm text-gray-600 flex items-center space-x-2 mt-2 md:mt-0">
+                        <FaCalendarAlt className="text-[#1C96AD]" />
+                        <span className="font-medium">{project.date}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed mb-3 p-4 bg-white/60 rounded-xl border border-gray-200">
+                    {project.description}
+                  </p>
+
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {project.technologies.map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl text-xs font-medium shadow-sm"
+                        >
+                          {tech}
+                        </span>
+                      ))}
                     </div>
                   )}
-                </div>
-                <p className="text-gray-600 text-sm mb-3">
-                  {project.description}
-                </p>
 
-                {project.technologies && project.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {project.technologies.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 bg-indigo-100 text-indigo-600 rounded text-xs"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {project.tags && project.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {project.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex space-x-4">
-                  {project.githubLink && (
-                    <a
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-gray-700 hover:text-teal-600 flex items-center space-x-1"
-                    >
-                      <FaGithub />
-                      <span>GitHub</span>
-                    </a>
+                  {project.tags && project.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {project.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-xl text-xs font-medium shadow-sm"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
                   )}
-                  {project.liveDemo && (
-                    <a
-                      href={project.liveDemo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-teal-600 hover:underline flex items-center space-x-1"
-                    >
-                      <FaExternalLinkAlt />
-                      <span>Live Demo</span>
-                    </a>
-                  )}
+
+                  <div className="flex space-x-4">
+                    {project.githubLink && (
+                      <a
+                        href={project.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-gray-700 hover:text-[#1C96AD] flex items-center space-x-2 font-medium transition-colors"
+                      >
+                        <FaGithub />
+                        <span>GitHub</span>
+                      </a>
+                    )}
+                    {project.liveDemo && (
+                      <a
+                        href={project.liveDemo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#1C96AD] hover:text-blue-700 flex items-center space-x-2 font-medium transition-colors"
+                      >
+                        <FaExternalLinkAlt />
+                        <span>Live Demo</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             )
@@ -410,7 +414,7 @@ export default function ProjectSection() {
                 <input
                   type="text"
                   placeholder="Project Title"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newProject.title}
                   onChange={(e) =>
                     setNewProject({ ...newProject, title: e.target.value })
@@ -419,7 +423,7 @@ export default function ProjectSection() {
                 <input
                   type="date"
                   placeholder="Date"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newProject.date}
                   onChange={(e) =>
                     setNewProject({ ...newProject, date: e.target.value })
@@ -428,7 +432,7 @@ export default function ProjectSection() {
               </div>
               <textarea
                 placeholder="Description"
-                className="input w-full px-4 py-2 border rounded-lg text-gray-800"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all resize-none"
                 rows={3}
                 value={newProject.description}
                 onChange={(e) =>
@@ -442,38 +446,38 @@ export default function ProjectSection() {
                   Technologies
                 </label>
                 <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Add technology"
-                    className="input flex-1 px-4 py-2 border rounded-lg text-gray-800"
-                    value={techInput}
-                    onChange={(e) => setTechInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddTech();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => handleAddTech()}
-                    className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
-                  >
-                    <FaPlus />
-                  </button>
+                    <input
+                      type="text"
+                      placeholder="Add technology"
+                      className="input flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
+                      value={techInput}
+                      onChange={(e) => setTechInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTech();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => handleAddTech()}
+                      className="px-4 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform"
+                    >
+                      <FaPlus />
+                    </button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {newProject.technologies.map((tech, idx) => (
                     <span
                       key={idx}
-                      className="px-2 py-1 bg-indigo-100 text-indigo-600 rounded text-xs flex items-center space-x-1"
+                      className="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-xl text-sm font-medium shadow-sm flex items-center space-x-1"
                     >
                       <span>{tech}</span>
                       <button
                         onClick={() => handleRemoveTech(tech)}
-                        className="text-indigo-400 hover:text-indigo-600"
+                        className="ml-2 hover:text-blue-900 transition-colors"
                       >
-                        ×
+                        ✖
                       </button>
                     </span>
                   ))}
@@ -486,38 +490,38 @@ export default function ProjectSection() {
                   Tags
                 </label>
                 <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Add tag"
-                    className="input flex-1 px-4 py-2 border rounded-lg text-gray-800"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddTag();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => handleAddTag()}
-                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                  >
-                    <FaPlus />
-                  </button>
+                    <input
+                      type="text"
+                      placeholder="Add tag"
+                      className="input flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => handleAddTag()}
+                      className="px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform"
+                    >
+                      <FaPlus />
+                    </button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {newProject.tags?.map((tag, idx) => (
                     <span
                       key={idx}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs flex items-center space-x-1"
+                      className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-xl text-sm font-medium shadow-sm flex items-center space-x-1"
                     >
                       <span>#{tag}</span>
                       <button
                         onClick={() => handleRemoveTag(tag)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="ml-2 hover:text-purple-900 transition-colors"
                       >
-                        ×
+                        ✖
                       </button>
                     </span>
                   ))}
@@ -528,7 +532,7 @@ export default function ProjectSection() {
                 <input
                   type="url"
                   placeholder="GitHub Link (Optional)"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newProject.githubLink}
                   onChange={(e) =>
                     setNewProject({ ...newProject, githubLink: e.target.value })
@@ -537,7 +541,7 @@ export default function ProjectSection() {
                 <input
                   type="url"
                   placeholder="Live Demo Link (Optional)"
-                  className="text-gray-800 input px-4 py-2 border rounded-lg"
+                  className="text-gray-800 input px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newProject.liveDemo}
                   onChange={(e) =>
                     setNewProject({ ...newProject, liveDemo: e.target.value })
@@ -545,18 +549,18 @@ export default function ProjectSection() {
                 />
               </div>
 
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 pt-2">
                 <button
                   onClick={handleAdd}
-                  className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                 >
-                  Save
+                  Enregistrer
                 </button>
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
@@ -565,10 +569,10 @@ export default function ProjectSection() {
           {!isAdding && (
             <button
               onClick={() => setIsAdding(true)}
-              className="w-full mt-4 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg flex items-center justify-center space-x-2 hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 px-6 py-3 border-2 border-dashed border-[#1C96AD] text-[#1C96AD] rounded-xl flex items-center justify-center space-x-2 hover:bg-[#1C96AD]/5 transition-colors font-medium"
             >
               <FaPlus />
-              <span>Add New Project</span>
+              <span>Ajouter un Projet</span>
             </button>
           )}
         </div>

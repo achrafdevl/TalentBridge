@@ -61,7 +61,7 @@ export default function EducationSection() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl border-0 bg-white rounded-3xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       <SectionHeader
         title="Education"
         icon={<span>🎓</span>}
@@ -69,14 +69,17 @@ export default function EducationSection() {
         onToggle={() => setIsExpanded(!isExpanded)}
       />
       {isExpanded && (
-        <div className="p-4 space-y-4">
+        <div className="p-8 space-y-6">
           {education.map((edu) =>
             editingId === edu.id && editingData ? (
-              <div key={edu.id} className="space-y-2">
+              <div
+                key={edu.id}
+                className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 space-y-4"
+              >
                 <input
                   type="text"
                   placeholder="School"
-                  className="input w-full px-3 py-2 border rounded-lg text-sm"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={editingData.school}
                   onChange={(e) =>
                     setEditingData({ ...editingData, school: e.target.value })
@@ -85,7 +88,7 @@ export default function EducationSection() {
                 <input
                   type="text"
                   placeholder="Certificate"
-                  className="input w-full px-3 py-2 border rounded-lg text-sm"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={editingData.certificate}
                   onChange={(e) =>
                     setEditingData({
@@ -97,17 +100,17 @@ export default function EducationSection() {
                 <input
                   type="text"
                   placeholder="Location"
-                  className="input w-full px-3 py-2 border rounded-lg text-sm"
+                  className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={editingData.location || ""}
                   onChange={(e) =>
                     setEditingData({ ...editingData, location: e.target.value })
                   }
                 />
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-4">
                   <input
                     type="text"
                     placeholder="Start Year"
-                    className="input px-3 py-2 border rounded-lg text-sm"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.startDate || ""}
                     onChange={(e) =>
                       setEditingData({
@@ -119,7 +122,7 @@ export default function EducationSection() {
                   <input
                     type="text"
                     placeholder="End Year"
-                    className="input px-3 py-2 border rounded-lg text-sm"
+                    className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                     value={editingData.endDate || ""}
                     onChange={(e) =>
                       setEditingData({
@@ -129,66 +132,78 @@ export default function EducationSection() {
                     }
                   />
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-3 pt-2">
                   <button
                     onClick={() => {
                       const { id, ...data } = editingData;
                       handleSaveEdit(id, data);
                     }}
-                    className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                   >
-                    Save
+                    Enregistrer
                   </button>
                   <button
                     onClick={() => {
                       setEditingId(null);
                       setEditingData(null);
                     }}
-                    className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                   >
-                    Cancel
+                    Annuler
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 key={edu.id}
-                className="border-b pb-2 last:border-none relative group"
+                className="group relative p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl border-2 border-gray-200 hover:border-[#1C96AD] hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="absolute top-0 right-0 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleRemove(edu.id)}
-                    className="p-1 text-red-500 hover:bg-red-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                    title="Supprimer"
                   >
-                    <FaTrash size={12} />
+                    <FaTrash size={16} />
                   </button>
                   <button
                     onClick={() => handleEdit(edu.id)}
-                    className="p-1 text-teal-500 hover:bg-teal-50 rounded"
+                    className="p-2 text-white bg-gradient-to-r from-[#1C96AD] to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg transition-all hover:scale-110 transform"
+                    title="Modifier"
                   >
-                    <FaEdit size={12} />
+                    <FaEdit size={16} />
                   </button>
                 </div>
-                <div className="font-medium text-gray-700">{edu.school}</div>
-                <div className="text-sm text-gray-500">{edu.certificate}</div>
-                {edu.location && (
-                  <div className="text-xs text-gray-400">{edu.location}</div>
-                )}
-                {edu.startDate && edu.endDate && (
-                  <div className="text-xs text-gray-400">
-                    {edu.startDate} - {edu.endDate}
+                <div className="pr-24">
+                  <div className="text-xl font-bold text-gray-900 mb-2">
+                    {edu.school}
                   </div>
-                )}
+                  <div className="text-lg font-semibold text-gray-800 mb-2">
+                    {edu.certificate}
+                  </div>
+                  {edu.location && (
+                    <div className="text-sm text-gray-600 mb-2 flex items-center gap-2">
+                      <span>📍</span>
+                      {edu.location}
+                    </div>
+                  )}
+                  {edu.startDate && edu.endDate && (
+                    <div className="text-sm text-gray-600 flex items-center gap-2">
+                      <span>📅</span>
+                      {edu.startDate} - {edu.endDate}
+                    </div>
+                  )}
+                </div>
               </div>
             )
           )}
 
           {isAdding && (
-            <div className="space-y-2 mt-4">
+            <div className="border-t pt-6 mt-6 space-y-4">
               <input
                 type="text"
                 placeholder="School"
-                className="input w-full px-3 py-2 border rounded-lg text-sm"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 value={newEducation.school}
                 onChange={(e) =>
                   setNewEducation({ ...newEducation, school: e.target.value })
@@ -197,7 +212,7 @@ export default function EducationSection() {
               <input
                 type="text"
                 placeholder="Certificate"
-                className="input w-full px-3 py-2 border rounded-lg text-sm"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 value={newEducation.certificate}
                 onChange={(e) =>
                   setNewEducation({
@@ -209,17 +224,17 @@ export default function EducationSection() {
               <input
                 type="text"
                 placeholder="Location (Optional)"
-                className="input w-full px-3 py-2 border rounded-lg text-sm"
+                className="input w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                 value={newEducation.location}
                 onChange={(e) =>
                   setNewEducation({ ...newEducation, location: e.target.value })
                 }
               />
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
                   placeholder="Start Year"
-                  className="input px-3 py-2 border rounded-lg text-sm"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newEducation.startDate}
                   onChange={(e) =>
                     setNewEducation({
@@ -231,7 +246,7 @@ export default function EducationSection() {
                 <input
                   type="text"
                   placeholder="End Year"
-                  className="input px-3 py-2 border rounded-lg text-sm"
+                  className="input px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:border-[#1C96AD] focus:ring-2 focus:ring-[#1C96AD]/20 transition-all"
                   value={newEducation.endDate}
                   onChange={(e) =>
                     setNewEducation({
@@ -241,18 +256,18 @@ export default function EducationSection() {
                   }
                 />
               </div>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3 pt-2">
                 <button
                   onClick={handleAdd}
-                  className="flex-1 px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 text-sm"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#1C96AD] to-blue-600 text-white rounded-xl hover:shadow-lg transition-all hover:scale-105 transform font-semibold"
                 >
-                  Save
+                  Enregistrer
                 </button>
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all font-semibold"
                 >
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
@@ -261,10 +276,10 @@ export default function EducationSection() {
           {!isAdding && (
             <button
               onClick={() => setIsAdding(true)}
-              className="w-full mt-2 px-4 py-3 border-2 border-dashed border-teal-300 text-teal-600 rounded-lg flex items-center justify-center space-x-2 text-sm hover:bg-teal-50 transition-colors"
+              className="w-full mt-4 px-6 py-3 border-2 border-dashed border-[#1C96AD] text-[#1C96AD] rounded-xl flex items-center justify-center space-x-2 hover:bg-[#1C96AD]/5 transition-colors font-medium"
             >
               <FaPlus />
-              <span>Add Education</span>
+              <span>Ajouter une Formation</span>
             </button>
           )}
         </div>
