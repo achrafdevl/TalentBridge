@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Form, HTTPException, Depends
 from fastapi.responses import FileResponse
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from docx import Document
 from docx.shared import Pt
 from bson import ObjectId
@@ -54,7 +54,7 @@ async def generate_cv(
             "job_id": job_id,
             "similarity": similarity,
             "tailored_text": tailored_content,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(UTC)
         })
 
         return {

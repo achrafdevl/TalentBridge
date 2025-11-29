@@ -6,7 +6,7 @@ including text extraction and named entity recognition.
 """
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from bson import ObjectId
 import logging
 
@@ -47,7 +47,7 @@ async def upload_cv(file: UploadFile = File(...), current_user: dict = Depends(g
         "file_path": str(save_path),
         "raw_text": cv_text,
         "entities": entities,  # Store extracted entities
-        "upload_date": datetime.utcnow(),
+        "upload_date": datetime.now(UTC),
         "user_id": str(current_user["_id"])
     }
 
@@ -88,7 +88,7 @@ async def create_cv_from_profile(current_user: dict = Depends(get_current_user))
         "file_path": None,
         "raw_text": cv_text,
         "entities": entities,  # Store extracted entities
-        "upload_date": datetime.utcnow(),
+        "upload_date": datetime.now(UTC),
         "from_profile": True,
         "user_id": user_id
     }

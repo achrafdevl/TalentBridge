@@ -6,7 +6,7 @@ This module provides endpoints for uploading job descriptions
 """
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from bson import ObjectId
 import logging
 
@@ -109,7 +109,7 @@ async def upload_job(
             "text": text_content,
             "job_text": text_content,  # Store as both 'text' and 'job_text' for compatibility
             "entities": entities,  # Store extracted entities
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(UTC)
         }
 
         try:

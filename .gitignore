@@ -1,3 +1,12 @@
 .venv*
 */.venv*
 .venv*
+
+# Large model files and datasets
+backend/app/train/*.pkl
+backend/app/train/data/*.csv
+backend/app/train/data/*.pkl
+
+# Generated files
+backend/generated_cvs/
+backend/uploaded_cvs/
