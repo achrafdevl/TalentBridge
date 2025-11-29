@@ -1,10 +1,23 @@
 
-import fitz  # PyMuPDF
-import pdfplumber
-from fastapi import HTTPException
-from pathlib import Path
-from docx import Document
 import logging
+from pathlib import Path
+
+from fastapi import HTTPException
+
+try:
+    import fitz  # type: ignore
+except ImportError:  # pragma: no cover
+    fitz = None
+
+try:
+    import pdfplumber  # type: ignore
+except ImportError:  # pragma: no cover
+    pdfplumber = None
+
+try:
+    from docx import Document
+except ImportError:  # pragma: no cover
+    Document = None  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +29,15 @@ def extract_text_from_file(file_path: Path) -> str:
 
     # --- PDF files ---
     if ext == ".pdf":
+        if fitz is None and pdfplumber is None:
+            raise HTTPException(status_code=500, detail="PDF extraction requires PyMuPDF or pdfplumber")
+
         try:
             text = ""
-            with fitz.open(file_path) as pdf:
+            if fitz is None:
+                raise RuntimeError("PyMuPDF not available")
+
+            with fitz.open(file_path) as pdf:  # type: ignore[operator]
                 for page in pdf:
                     text += page.get_text("text") + "\n"
 
@@ -31,8 +50,10 @@ def extract_text_from_file(file_path: Path) -> str:
         except Exception as e:
             logger.warning(f"PyMuPDF failed on {file_path.name}, falling back to pdfplumber: {e}")
             try:
+                if pdfplumber is None:
+                    raise RuntimeError("pdfplumber not available")
                 text = ""
-                with pdfplumber.open(file_path) as pdf:
+                with pdfplumber.open(file_path) as pdf:  # type: ignore[operator]
                     for page in pdf.pages:
                         page_text = page.extract_text()
                         if page_text:
@@ -44,6 +65,9 @@ def extract_text_from_file(file_path: Path) -> str:
 
     # --- DOCX files ---
     elif ext == ".docx":
+        if Document is None:
+            raise HTTPException(status_code=500, detail="python-docx is required for DOCX extraction")
+
         try:
             doc = Document(file_path)
             return "\n".join(p.text for p in doc.paragraphs if p.text.strip())

@@ -1,13 +1,21 @@
 
 cd backend && source .venv311/Scripts/activate && python -m uvicorn app.main:app --reload
 
+
+Quora Question Pairs (QQP)
+
+Quora Question Pairs sur Kaggle
+
+Paires de questions : duplicate ou not duplicate.
+
 Tailored cover letters: Generate a personalized cover letter aligned with the job.
 
 exrtractions des entités
 tableau
 
 
-'''''''''hagging face search :🧠 1. thenlper/gte-base
+'''''''''
+        hagging face search :🧠 1. thenlper/gte-base
 
         🔗 https://huggingface.co/thenlper/gte-base
 
