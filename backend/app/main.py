@@ -15,7 +15,8 @@ from app.routes import (
     job_routes, 
     generate_routes,
     similarity_routes,
-    analysis_routes
+    analysis_routes,
+    export_routes
 )
 from app.auth import auth_routes
 
@@ -59,6 +60,7 @@ app.include_router(job_routes.router)
 app.include_router(generate_routes.router)
 app.include_router(similarity_routes.router)
 app.include_router(analysis_routes.router)  # ✅ Correct route include
+app.include_router(export_routes.router)
 
 @app.get("/")
 def root():

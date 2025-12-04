@@ -12,11 +12,13 @@ import {
   FaBriefcase,
   FaBars,
   FaSignOutAlt,
-  FaCog,
   FaChevronDown,
   FaChevronRight,
   FaPlus,
   FaEye,
+  FaUserTie,
+  FaSearch,
+  FaUserCircle,
 } from "react-icons/fa";
 import { cn } from "@/app/lib/utils";
 import Image from "next/image";
@@ -29,8 +31,8 @@ const menuItems = [
     badge: null,
   },
   {
-    title: "Profil Pro",
-    icon: FaUser,
+    title: "Profil Professionnel",
+    icon: FaUserTie,
     path: "/job-profile",
     badge: null,
   },
@@ -51,15 +53,15 @@ const menuItems = [
     badge: "12",
   },
   {
-    title: "Mon Profil",
-    icon: FaCog,
-    path: "/profile",
+    title: "Analyse de CV",
+    icon: FaSearch,
+    path: "/exrtractions",
     badge: null,
   },
   {
-    title: "CV details",
-    icon: FaCog,
-    path: "/exrtractions",
+    title: "Mon Profil",
+    icon: FaUserCircle,
+    path: "/profile",
     badge: null,
   },
 ];

@@ -181,3 +181,36 @@ export const downloadGenerated = async (generatedId: string) => {
   if (!res.ok) throw new Error(`downloadGenerated failed ${res.status}`);
   return res.blob();
 };
+
+export const exportCvData = async (cvId: string) => {
+  const token = Cookies.get("tb_token");
+  if (!token) {
+    throw new Error("Authentication required. Please log in to export CV data.");
+  }
+
+  const res = await fetch(`${API_BASE}/export/cv/${cvId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    let errorMessage = `Failed to export CV data (${res.status})`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.detail || errorData.message || errorMessage;
+    } catch {
+      const txt = await res.text();
+      if (txt) errorMessage = txt;
+    }
+
+    if (res.status === 401) {
+      errorMessage = `${errorMessage} Please log in again.`;
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  return res.json();
+};

@@ -6,8 +6,9 @@ import {
   FaInfoCircle,
   FaCheckCircle,
   FaExclamationTriangle,
+  FaDownload,
 } from "react-icons/fa";
-import { uploadCV, getCvDetails } from "@/services/api";
+import { uploadCV, getCvDetails, exportCvData } from "@/services/api";
 
 type EntitiesMap = Record<string, string[]>;
 
@@ -205,6 +206,7 @@ export default function ExtractionsPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) {
@@ -237,6 +239,68 @@ export default function ExtractionsPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleExport = async () => {
+    if (!cvDetails || exporting) return;
+    setError(null);
+    setExporting(true);
+    try {
+      const exportResult = await exportCvData(cvDetails._id);
+      setSuccess(
+        `Données exportées et sauvegardées avec succès ! (ID: ${exportResult.export_id})`
+      );
+
+      // Optionally download as CSV
+      const tableData = exportResult.table_data;
+      if (tableData && tableData.rows && tableData.columns) {
+        downloadAsCSV(tableData.columns, tableData.rows, cvDetails.filename);
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Échec de l'export. Veuillez réessayer.";
+      setError(message);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const downloadAsCSV = (
+    columns: string[],
+    rows: Array<Record<string, string | number>>,
+    filename: string
+  ) => {
+    // Create CSV content
+    const csvHeaders = columns.join(",");
+    const csvRows = rows.map((row) =>
+      columns
+        .map((col) => {
+          const value = row[col] || "";
+          // Escape commas and quotes in CSV
+          const stringValue = String(value).replace(/"/g, '""');
+          return `"${stringValue}"`;
+        })
+        .join(",")
+    );
+
+    const csvContent = [csvHeaders, ...csvRows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `export_${filename.replace(/\.[^/.]+$/, "")}_${
+        new Date().toISOString().split("T")[0]
+      }.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const entityRows = cvDetails
@@ -410,11 +474,23 @@ export default function ExtractionsPage() {
           <h2 className="text-2xl font-bold text-gray-900">
             3. Entités détectées
           </h2>
-          {cvDetails && (
-            <span className="text-sm text-gray-500">
-              CV analysé : {cvDetails.filename}
-            </span>
-          )}
+          <div className="flex items-center gap-3 flex-wrap">
+            {cvDetails && (
+              <span className="text-sm text-gray-500">
+                CV analysé : {cvDetails.filename}
+              </span>
+            )}
+            {cvDetails && (
+              <button
+                onClick={handleExport}
+                disabled={exporting}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-semibold transition-all bg-gradient-to-r from-emerald-500 to-green-600 disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-lg"
+              >
+                <FaDownload />
+                {exporting ? "Export en cours..." : "Exporter les données"}
+              </button>
+            )}
+          </div>
         </div>
 
         {!cvDetails && (
@@ -427,12 +503,6 @@ export default function ExtractionsPage() {
           <>
             {!hasAnyDetection && (
               <div className="mt-8 text-center py-8 text-gray-600 space-y-2 border border-dashed border-gray-200 rounded-2xl bg-gray-50">
-                <p className="text-base font-semibold text-gray-900">
-                  Entités détectées
-                </p>
-                <p className="text-sm text-gray-500">
-                  CV analysé : {cvDetails.filename}
-                </p>
                 <p className="text-sm text-gray-500">
                   Aucune entité n&apos;a été détectée ou les données sont vides.
                 </p>
